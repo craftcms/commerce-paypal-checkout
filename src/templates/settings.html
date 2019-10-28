@@ -1,0 +1,57 @@
+{% from "_includes/forms" import textField, lightswitchField, selectField, autosuggestField %}
+
+{{ lightswitchField({
+  label: "Should commerce send cart information to gateway when making transactions."|t('commerce'),
+  id: 'sendCartInfo',
+  name: 'sendCartInfo',
+  on: gateway.sendCartInfo,
+  errors: gateway.getErrors('sendCartInfo'),
+}) }}
+
+{{ autosuggestField({
+  label: 'Client ID'|t('commerce'),
+  id: 'clientId',
+  class: 'ltr',
+  name: 'clientId',
+  suggestEnvVars: true,
+  value: gateway.clientId,
+  errors: gateway.getErrors('clientId')
+}) }}
+
+{{ autosuggestField({
+  label: "Secret"|t('commerce'),
+  id: 'secret',
+  class: 'ltr',
+  name: 'secret',
+  suggestEnvVars: true,
+  value: gateway.secret,
+  errors: gateway.getErrors('secret')
+}) }}
+
+{{ lightswitchField({
+  label: "Test mode?"|t('commerce'),
+  name: 'testMode',
+  on: gateway.testMode,
+  errors: gateway.getErrors('testMode'),
+}) }}
+
+{{ selectField({
+  label: "Landing page"|t('commerce'),
+  name: 'landingPage',
+  options: {
+    'BILLING': 'Billing',
+    'LOGIN': 'Login',
+    'NO_PREFERENCE': 'No Preference'
+  },
+  value: gateway.landingPage,
+  errors: gateway.getErrors('landingPage')
+}) }}
+
+{{ textField({
+  label: "Brand name"|t('commerce'),
+  id: 'brandName',
+  class: 'ltr',
+  name: 'brandName',
+  value: gateway.brandName,
+  errors: gateway.getErrors('brandName')
+}) }}

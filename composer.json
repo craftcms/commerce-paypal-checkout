@@ -1,0 +1,42 @@
+{
+  "name": "craftcms/commerce-paypal-checkout",
+  "description": "PayPal Checkout integration for Craft Commerce 2",
+  "version": "1.0.0-alpha",
+  "type": "craft-plugin",
+  "keywords": [
+    "paypal",
+    "checkout",
+    "commerce",
+    "craftcms",
+    "yii2"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Pixel & Tonic",
+      "homepage": "https://pixelandtonic.com/"
+    }
+  ],
+  "support": {
+    "email": "support@craftcms.com",
+    "issues": "https://github.com/craftcms/commerce-paypal-checkout/issues?state=open",
+    "source": "https://github.com/craftcms/commerce-paypal-checkout",
+    "docs": "https://github.com/craftcms/commerce-paypal-checkout/blob/master/README.md",
+    "rss": "https://github.com/craftcms/commerce-paypal-checkout/commits/master.atom"
+  },
+  "require": {
+    "craftcms/cms": "^3.3.4",
+    "craftcms/commerce": "^2.2|^3.0",
+    "paypal/paypal-checkout-sdk": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "craft\\commerce\\paypalcheckout\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "PayPal Checkout for Craft Commerce",
+    "handle": "commerce-paypal-checkout",
+    "documentationUrl": "https://github.com/craftcms/commerce-paypal-checkout/blob/master/README.md"
+  }
+}
