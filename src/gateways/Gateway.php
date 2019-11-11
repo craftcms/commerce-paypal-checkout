@@ -490,7 +490,7 @@ class Gateway extends BaseGateway
             'brand_name' => $this->brandName,
             'locale' => Craft::$app->getLocale()->id,
             'landing_page' => $this->landingPage,
-            'shipping_preferences' => 'SET_PROVIDED_ADDRESS',
+            'shipping_preference' => 'SET_PROVIDED_ADDRESS',
             'user_action' => 'PAY_NOW',
             'return_url' => UrlHelper::siteUrl($order->returnUrl),
             'cancel_url' => UrlHelper::siteUrl($order->cancelUrl)
