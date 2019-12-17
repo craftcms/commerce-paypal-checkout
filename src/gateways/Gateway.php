@@ -130,7 +130,7 @@ class Gateway extends BaseGateway
         $previousMode = $view->getTemplateMode();
         $view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . $this->clientId);
+        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId));
         // IE polyfill
         $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
         $view->registerAssetBundle(PayPalCheckoutBundle::class);
@@ -321,9 +321,9 @@ class Gateway extends BaseGateway
     public function createClient(): PayPalHttpClient
     {
         if (!$this->testMode) {
-            $environment = new ProductionEnvironment($this->clientId, $this->secret);
+            $environment = new ProductionEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
         } else {
-            $environment = new SandboxEnvironment($this->clientId, $this->secret);
+            $environment = new SandboxEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
         }
 
         return new PayPalHttpClient($environment);
