@@ -583,7 +583,7 @@ class Gateway extends BaseGateway
                 'sku' => $lineItem->sku,
                 'unit_amount' => [
                         'currency_code' => $order->paymentCurrency,
-                        'value' => $lineItem->onSale ? $lineItem->salePrice : $lineItem->price,
+                        'value' => Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
                     ], // required
                 'quantity' => $lineItem->qty, // required
             ];
