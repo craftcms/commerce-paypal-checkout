@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.0.2 - 2020-02-16
 
 ### Fixed
 - Fixed a bug that could occur if the sale price of a line item was not rounded.
