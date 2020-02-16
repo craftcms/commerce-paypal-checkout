@@ -537,19 +537,17 @@ class Gateway extends BaseGateway
                     'item_total' =>
                         [
                             'currency_code' => $order->paymentCurrency,
-                            'value' => $order->getItemSubtotal(),
+                            'value' => Currency::round($order->getItemSubtotal()),
                         ],
                     'shipping' =>
                         [
                             'currency_code' => $order->paymentCurrency,
                             'value' => Currency::round($order->getTotalShippingCost()),
-                            // 'value' => $order->getAdjustmentsTotalByType('shipping'),
                         ],
                     'tax_total' =>
                         [
                             'currency_code' => $order->paymentCurrency,
                             'value' => Currency::round($order->getTotalTax()),
-                            // 'value' => $order->getAdjustmentsTotalByType('tax'),
                         ],
                 ],
         ];
