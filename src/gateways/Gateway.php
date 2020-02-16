@@ -537,19 +537,17 @@ class Gateway extends BaseGateway
                     'item_total' =>
                         [
                             'currency_code' => $order->paymentCurrency,
-                            'value' => $order->getItemSubtotal(),
+                            'value' => Currency::round($order->getItemSubtotal()),
                         ],
                     'shipping' =>
                         [
                             'currency_code' => $order->paymentCurrency,
                             'value' => Currency::round($order->getTotalShippingCost()),
-                            // 'value' => $order->getAdjustmentsTotalByType('shipping'),
                         ],
                     'tax_total' =>
                         [
                             'currency_code' => $order->paymentCurrency,
                             'value' => Currency::round($order->getTotalTax()),
-                            // 'value' => $order->getAdjustmentsTotalByType('tax'),
                         ],
                 ],
         ];
@@ -583,7 +581,7 @@ class Gateway extends BaseGateway
                 'sku' => $lineItem->sku,
                 'unit_amount' => [
                         'currency_code' => $order->paymentCurrency,
-                        'value' => $lineItem->onSale ? $lineItem->salePrice : $lineItem->price,
+                        'value' => Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
                     ], // required
                 'quantity' => $lineItem->qty, // required
             ];
@@ -603,16 +601,25 @@ class Gateway extends BaseGateway
         /** @var Address $shippingAddress */
         $shippingAddress = $order->shippingAddress;
 
-        return [
-        'method' => $shippingMethod->name,
-            'address' => [
-                'address_line_1' => $shippingAddress->address1,
-                'address_line_2' => $shippingAddress->address2,
-                'admin_area_2' => $shippingAddress->city,
-                'admin_area_1' => $shippingAddress->stateText,
-                'postal_code' => $shippingAddress->zipCode,
-                'country_code' => $shippingAddress->country->iso,
-            ]
-        ];
+        $return = [];
+
+        if ($shippingAddress) {
+            $return = [
+                'address' => [
+                    'address_line_1' => $shippingAddress->address1,
+                    'address_line_2' => $shippingAddress->address2,
+                    'admin_area_2' => $shippingAddress->city,
+                    'admin_area_1' => $shippingAddress->stateText,
+                    'postal_code' => $shippingAddress->zipCode,
+                    'country_code' => $shippingAddress->country->iso,
+                ]
+            ];
+        }
+
+        if ($shippingMethod) {
+            $return['method'] = $shippingMethod->name;
+        }
+
+        return $return;
     }
 }
