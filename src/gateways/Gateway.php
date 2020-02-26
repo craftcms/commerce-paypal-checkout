@@ -49,6 +49,7 @@ use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
  */
 class Gateway extends BaseGateway
 {
+    const PAYMENT_TYPES = [
         'authorize' => 'AUTHORIZE',
         'purchase' => 'CAPTURE'
     ];
