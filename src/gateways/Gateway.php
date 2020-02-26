@@ -130,7 +130,7 @@ class Gateway extends BaseGateway
         $previousMode = $view->getTemplateMode();
         $view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId));
+        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId), ['data-namespace' => 'paypal_checkout_sdk']);
         // IE polyfill
         $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
         $view->registerAssetBundle(PayPalCheckoutBundle::class);
@@ -486,17 +486,19 @@ class Gateway extends BaseGateway
         $requestData = [];
         $requestData['intent'] = self::PAYMENT_TYPES[$this->paymentType] ?? 'CAPTURE';
 
+        $requestData['purchase_units'] = $this->_buildPurchaseUnits($order, $transaction);
+
+        $shippingPreference = isset($requestData['purchase_units'][0]['shipping']) && !empty($requestData['purchase_units'][0]['shipping']) ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING';
+
         $requestData['application_context'] = [
             'brand_name' => $this->brandName,
             'locale' => Craft::$app->getLocale()->id,
             'landing_page' => $this->landingPage,
-            'shipping_preference' => 'SET_PROVIDED_ADDRESS',
+            'shipping_preference' => $shippingPreference,
             'user_action' => 'PAY_NOW',
             'return_url' => UrlHelper::siteUrl($order->returnUrl),
             'cancel_url' => UrlHelper::siteUrl($order->cancelUrl)
         ];
-
-        $requestData['purchase_units'] = $this->_buildPurchaseUnits($order, $transaction);
 
         return $requestData;
     }
@@ -510,16 +512,22 @@ class Gateway extends BaseGateway
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
+        $purchaseUnits = [
+            'description' => Craft::$app->getConfig()->getGeneral()->siteName,
+            'invoice_id' => $order->reference,
+            'custom_id' => $transaction->hash,
+            'soft_descriptor' => Craft::$app->getConfig()->getGeneral()->siteName,
+            'amount' => $this->_buildAmount($order),
+            'items' => $this->_buildItems($order),
+        ];
+
+        $shipping = $this->_buildShipping($order);
+        if (!empty($shipping)) {
+            $purchaseUnits['shipping'] = $shipping;
+        }
+
         return [
-            [
-                'description' => Craft::$app->getConfig()->getGeneral()->siteName,
-                'invoice_id' => $order->reference,
-                'custom_id' => $transaction->hash,
-                'soft_descriptor' => Craft::$app->getConfig()->getGeneral()->siteName,
-                'amount' => $this->_buildAmount($order),
-                'items' => $this->_buildItems($order),
-                'shipping' => $this->_buildShipping($order)
-            ]
+            $purchaseUnits
         ];
     }
 
@@ -616,7 +624,7 @@ class Gateway extends BaseGateway
             ];
         }
 
-        if ($shippingMethod) {
+        if ($shippingAddress && $shippingMethod) {
             $return['method'] = $shippingMethod->name;
         }
 
