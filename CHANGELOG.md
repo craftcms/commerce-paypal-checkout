@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.0.3 - 2020-02-26
 
 ### Added
 - Added the ability to checkout without a shipping address.
