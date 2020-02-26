@@ -1,5 +1,5 @@
 function initPaypalCheckout() {
-    if (typeof paypal === "undefined") {
+    if (typeof paypal_checkout_sdk === "undefined") {
         setTimeout(initPaypalCheckout, 200);
     } else {
         var $wrapper = $('.paypal-rest-form');
@@ -9,7 +9,7 @@ function initPaypalCheckout() {
         var transactionHash;
         var errorShown = false;
 
-        paypal.Buttons({
+        paypal_checkout_sdk.Buttons({
             createOrder: function(data, actions) {
                 // Set up the transaction
                 var postData = {};
