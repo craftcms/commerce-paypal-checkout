@@ -539,23 +539,23 @@ class Gateway extends BaseGateway
     {
         $return = [
             'currency_code' => $order->paymentCurrency,
-            'value' => $order->getTotal(),
+            'value' => (string)$order->getTotal(),
             'breakdown' =>
                 [
                     'item_total' =>
                         [
                             'currency_code' => $order->paymentCurrency,
-                            'value' => Currency::round($order->getItemSubtotal()),
+                            'value' => (string)Currency::round($order->getItemSubtotal()),
                         ],
                     'shipping' =>
                         [
                             'currency_code' => $order->paymentCurrency,
-                            'value' => Currency::round($order->getTotalShippingCost()),
+                            'value' => (string)Currency::round($order->getTotalShippingCost()),
                         ],
                     'tax_total' =>
                         [
                             'currency_code' => $order->paymentCurrency,
-                            'value' => Currency::round($order->getTotalTax()),
+                            'value' => (string)Currency::round($order->getTotalTax()),
                         ],
                 ],
         ];
@@ -565,7 +565,7 @@ class Gateway extends BaseGateway
         if ($discount !== 0) {
             $return['breakdown']['discount'] = [
                 'currency_code' => $order->paymentCurrency,
-                'value' => Currency::round($discount * -1), // Needs to be a positive number
+                'value' => (string)Currency::round($discount * -1), // Needs to be a positive number
             ];
         }
 
@@ -589,7 +589,7 @@ class Gateway extends BaseGateway
                 'sku' => $lineItem->sku,
                 'unit_amount' => [
                         'currency_code' => $order->paymentCurrency,
-                        'value' => Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
+                        'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
                     ], // required
                 'quantity' => $lineItem->qty, // required
             ];

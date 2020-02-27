@@ -1,7 +1,7 @@
 {
   "name": "craftcms/commerce-paypal-checkout",
   "description": "PayPal Checkout integration for Craft Commerce 2",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "craft-plugin",
   "keywords": [
     "paypal",
