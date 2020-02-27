@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.0.4 - 2020-02-27
 
 ### Fixed
 - Fixed an issue where JavaScript would cause float values to be malformed.
