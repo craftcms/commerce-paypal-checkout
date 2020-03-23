@@ -539,34 +539,36 @@ class Gateway extends BaseGateway
     {
         $return = [
             'currency_code' => $order->paymentCurrency,
-            'value' => (string)$order->getTotal(),
-            'breakdown' =>
-                [
-                    'item_total' =>
-                        [
-                            'currency_code' => $order->paymentCurrency,
-                            'value' => (string)Currency::round($order->getItemSubtotal()),
-                        ],
-                    'shipping' =>
-                        [
-                            'currency_code' => $order->paymentCurrency,
-                            'value' => (string)Currency::round($order->getTotalShippingCost()),
-                        ],
-                    'tax_total' =>
-                        [
-                            'currency_code' => $order->paymentCurrency,
-                            'value' => (string)Currency::round($order->getTotalTax()),
-                        ],
-                ],
+            'value' => (string)$order->getOutstandingBalance(),
         ];
 
-        // $discount = $order->getAdjustmentsTotalByType('discount') * -1;
-        $discount = $order->getTotalDiscount();
-        if ($discount !== 0) {
-            $return['breakdown']['discount'] = [
-                'currency_code' => $order->paymentCurrency,
-                'value' => (string)Currency::round($discount * -1), // Needs to be a positive number
+        if (!$this->_isPartialPayment($order)) {
+            $return['breakdown'] = [
+                'item_total' =>
+                    [
+                        'currency_code' => $order->paymentCurrency,
+                        'value' => (string)Currency::round($order->getItemSubtotal()),
+                    ],
+                'shipping' =>
+                    [
+                        'currency_code' => $order->paymentCurrency,
+                        'value' => (string)Currency::round($order->getTotalShippingCost()),
+                    ],
+                'tax_total' =>
+                    [
+                        'currency_code' => $order->paymentCurrency,
+                        'value' => (string)Currency::round($order->getTotalTax()),
+                    ],
             ];
+
+            // $discount = $order->getAdjustmentsTotalByType('discount') * -1;
+            $discount = $order->getTotalDiscount();
+            if ($discount !== 0) {
+                $return['breakdown']['discount'] = [
+                    'currency_code' => $order->paymentCurrency,
+                    'value' => (string)Currency::round($discount * -1), // Needs to be a positive number
+                ];
+            }
         }
 
         return $return;
@@ -578,7 +580,7 @@ class Gateway extends BaseGateway
      */
     private function _buildItems(Order $order): array
     {
-        if (!$this->sendCartInfo) {
+        if (!$this->sendCartInfo || $this->_isPartialPayment($order)) {
             return [];
         }
 
@@ -629,5 +631,14 @@ class Gateway extends BaseGateway
         }
 
         return $return;
+    }
+
+    /**
+     * @param Order $order
+     * @return bool
+     */
+    private function _isPartialPayment(Order $order): bool
+    {
+        return $order->hasOutstandingBalance() && $order->getOutstandingBalance() < $order->getTotal();
     }
 }
