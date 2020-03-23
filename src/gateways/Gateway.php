@@ -636,6 +636,7 @@ class Gateway extends BaseGateway
     /**
      * @param Order $order
      * @return bool
+     * @since 1.0.5
      */
     private function _isPartialPayment(Order $order): bool
     {
