@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.0.5 - 2020-03-23
 
 ### Added
 - Added support for payment of outstanding balance on an order. ([#9](https://github.com/craftcms/commerce-paypal-checkout/issues/9))
