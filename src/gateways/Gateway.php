@@ -130,7 +130,8 @@ class Gateway extends BaseGateway
         $previousMode = $view->getTemplateMode();
         $view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId), ['data-namespace' => 'paypal_checkout_sdk']);
+        $intent = self::PAYMENT_TYPES[$this->paymentType] === 'AUTHORIZE' ? '&intent=authorize' : '';
+        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId) . $intent, ['data-namespace' => 'paypal_checkout_sdk']);
         // IE polyfill
         $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
         $view->registerAssetBundle(PayPalCheckoutBundle::class);
