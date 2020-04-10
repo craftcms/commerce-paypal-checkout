@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+### Unreleased
+
+### Fixed
+- Fixed a JavaScript error that occurred when setting authorize payment type. ([#13](https://github.com/craftcms/commerce-paypal-checkout/issues/13))
+
 ## 1.0.5 - 2020-03-23
 
 ### Added
