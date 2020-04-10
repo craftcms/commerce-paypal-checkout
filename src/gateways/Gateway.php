@@ -54,6 +54,11 @@ class Gateway extends BaseGateway
         'purchase' => 'CAPTURE'
     ];
 
+    /**
+     * @since 1.x
+     */
+    CONST SDK_URL = 'https://www.paypal.com/sdk/js';
+
     // Public Properties
     // =========================================================================
 
@@ -130,7 +135,8 @@ class Gateway extends BaseGateway
         $previousMode = $view->getTemplateMode();
         $view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId), ['data-namespace' => 'paypal_checkout_sdk']);
+        $view->registerJsFile(self::SDK_URL . '?' . $this->_sdkQueryParameters(), ['data-namespace' => 'paypal_checkout_sdk']);
+
         // IE polyfill
         $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
         $view->registerAssetBundle(PayPalCheckoutBundle::class);
@@ -641,5 +647,24 @@ class Gateway extends BaseGateway
     private function _isPartialPayment(Order $order): bool
     {
         return $order->hasOutstandingBalance() && $order->getOutstandingBalance() < $order->getTotal();
+    }
+
+    /**
+     * @return string
+     * @since 1.x
+     */
+    private function _sdkQueryParameters(): string
+    {
+        $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
+        $params = [
+            'client-id' => Craft::parseEnv($this->clientId),
+            'intent' => $intent,
+        ];
+
+        foreach ($params as $key => &$param) {
+            $param = $key . '=' . urlencode($param);
+        }
+
+        return implode('&', $params);
     }
 }
