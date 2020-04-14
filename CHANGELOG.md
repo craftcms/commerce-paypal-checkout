@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-### Unreleased
+### 1.1.0 - 2020-04-14
 
 ### Added
 - Added the ability to pay in a currency other than the primary payment currency.
