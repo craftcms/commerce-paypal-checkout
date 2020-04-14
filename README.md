@@ -74,3 +74,19 @@ You must pass the currency ISO in the method params. For example if you have alr
 ```
 
 This is required when paying with an alternative payment currency due to the integration of the PayPal JavaScript SDK.
+
+### SDK query string parameters
+
+This gateway allows the passing of certain query string parameters, at runtime, as specified in the [PayPal documentation](https://developer.paypal.com/docs/checkout/reference/customize-sdk/#query-parameters).
+
+THe allowed parameters are `currency` (as detailed above), `disable-card` and `disable-funding`.
+
+As an example to disable PayPal credit funding you could output the payment form as follows:
+
+```twig
+{{ cart.gateway.getPaymentFormHtml({
+  ...
+  'disable-funding': 'credit'
+  ...
+}) }}
+```
