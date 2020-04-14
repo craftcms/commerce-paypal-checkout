@@ -56,7 +56,7 @@ class Gateway extends BaseGateway
     ];
 
     /**
-     * @since 1.x
+     * @since 1.1.0
      */
     CONST SDK_URL = 'https://www.paypal.com/sdk/js';
 
@@ -654,7 +654,7 @@ class Gateway extends BaseGateway
     /**
      * @param Order $order
      * @return array
-     * @since 1.x
+     * @since 1.1.0
      */
     private function _buildPayer(Order $order): array
     {
@@ -706,7 +706,7 @@ class Gateway extends BaseGateway
      * @param Order $order
      * @param Transaction $transaction
      * @return bool
-     * @since 1.x
+     * @since 1.1.0
      */
     private function _isPaymentInBaseCurrency(Order $order, Transaction $transaction): bool
     {
@@ -716,7 +716,7 @@ class Gateway extends BaseGateway
     /**
      * @param array $passedParams
      * @return string
-     * @since 1.x
+     * @since 1.1.0
      */
     private function _sdkQueryParameters(Array $passedParams): string
     {
