@@ -672,7 +672,11 @@ class Gateway extends BaseGateway
      */
     private function _sdkQueryParameters(Array $passedParams): string
     {
-        $passedParamsMergeKeys = ['currency'];
+        $passedParamsMergeKeys = [
+            'currency',
+            'disable-card',
+            'disable-funding',
+        ];
         $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
         $params = [
             'client-id' => Craft::parseEnv($this->clientId),

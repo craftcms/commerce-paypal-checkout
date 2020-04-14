@@ -4,6 +4,7 @@
 
 ### Added
 - Added the ability to pay in a currency other than the primary payment currency.
+- Added the ability to set `disable-funding` and `disable-card` PayPal SDK query parameters. ([#14](https://github.com/craftcms/commerce-paypal-checkout/issues/14))
 
 ### Fixed
 - Fixed a JavaScript error that occurred when setting authorize payment type. ([#13](https://github.com/craftcms/commerce-paypal-checkout/issues/13))
