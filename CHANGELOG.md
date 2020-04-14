@@ -2,6 +2,9 @@
 
 ### Unreleased
 
+### Added
+- Added the ability to pay in a currency other than the primary payment currency.
+
 ### Fixed
 - Fixed a JavaScript error that occurred when setting authorize payment type. ([#13](https://github.com/craftcms/commerce-paypal-checkout/issues/13))
 
