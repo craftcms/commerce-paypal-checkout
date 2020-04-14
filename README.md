@@ -60,3 +60,33 @@ Use the Live and Sandbox toggle at the top of My Apps & Credentials to switch be
 To add the PayPal Checkout gateway, go to Commerce → Settings → Gateways, create a new gateway, and set the gateway type to “PayPal Checkout”.
 
 In the gateway settings enter the **client ID** and **secret** for your rest app in their respective fields.
+
+### Paying with non-primary currency
+
+When using the `getPaymentFormHtml()` method (e.g. `cart.gateway.getPaymentFormHtml({})) and allowing payment in a currency other than the primary currency.
+
+You must pass the currency ISO in the method params. For example if you have already set the alternative payment currency on the cart you could do the following:
+
+```twig
+{{ cart.gateway.getPaymentFormHtml({
+  currency: cart.paymentCurrency
+}) }}
+```
+
+This is required when paying with an alternative payment currency due to the integration of the PayPal JavaScript SDK.
+
+### SDK query string parameters
+
+This gateway allows the passing of certain query string parameters, at runtime, as specified in the [PayPal documentation](https://developer.paypal.com/docs/checkout/reference/customize-sdk/#query-parameters).
+
+THe allowed parameters are `currency` (as detailed above), `disable-card` and `disable-funding`.
+
+As an example to disable PayPal credit funding you could output the payment form as follows:
+
+```twig
+{{ cart.gateway.getPaymentFormHtml({
+  ...
+  'disable-funding': 'credit'
+  ...
+}) }}
+```

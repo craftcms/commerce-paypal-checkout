@@ -1,5 +1,15 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+### 1.1.0 - 2020-04-14
+
+### Added
+- Added the ability to pay in a currency other than the primary payment currency.
+- Added the ability to set `disable-funding` and `disable-card` PayPal SDK query parameters. ([#14](https://github.com/craftcms/commerce-paypal-checkout/issues/14))
+- Billing address details are now passed to PayPal via the `payer` object. ([#11](https://github.com/craftcms/commerce-paypal-checkout/issues/11))
+
+### Fixed
+- Fixed a JavaScript error that occurred when setting authorize payment type. ([#13](https://github.com/craftcms/commerce-paypal-checkout/issues/13))
+
 ## 1.0.5 - 2020-03-23
 
 ### Added

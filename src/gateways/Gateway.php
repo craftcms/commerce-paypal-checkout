@@ -22,6 +22,7 @@ use craft\commerce\models\Transaction;
 use craft\commerce\paypalcheckout\PayPalCheckoutBundle;
 use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
+use craft\commerce\Plugin;
 use craft\helpers\ArrayHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Response as WebResponse;
@@ -53,6 +54,11 @@ class Gateway extends BaseGateway
         'authorize' => 'AUTHORIZE',
         'purchase' => 'CAPTURE'
     ];
+
+    /**
+     * @since 1.1.0
+     */
+    CONST SDK_URL = 'https://www.paypal.com/sdk/js';
 
     // Public Properties
     // =========================================================================
@@ -120,7 +126,8 @@ class Gateway extends BaseGateway
     public function getPaymentFormHtml(array $params)
     {
         $defaults = [
-            'gateway' => $this
+            'gateway' => $this,
+            'currency' => Plugin::getInstance()->getPaymentCurrencies()->getPrimaryPaymentCurrencyIso(),
         ];
 
         $params = array_merge($defaults, $params);
@@ -130,7 +137,8 @@ class Gateway extends BaseGateway
         $previousMode = $view->getTemplateMode();
         $view->setTemplateMode(View::TEMPLATE_MODE_CP);
 
-        $view->registerJsFile('https://www.paypal.com/sdk/js?client-id=' . Craft::parseEnv($this->clientId), ['data-namespace' => 'paypal_checkout_sdk']);
+        $view->registerJsFile(self::SDK_URL . '?' . $this->_sdkQueryParameters($params), ['data-namespace' => 'paypal_checkout_sdk']);
+
         // IE polyfill
         $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
         $view->registerAssetBundle(PayPalCheckoutBundle::class);
@@ -486,9 +494,13 @@ class Gateway extends BaseGateway
         $requestData = [];
         $requestData['intent'] = self::PAYMENT_TYPES[$this->paymentType] ?? 'CAPTURE';
 
+        if ($payer = $this->_buildPayer($order)) {
+            $requestData['payer'] = $payer;
+        }
+
         $requestData['purchase_units'] = $this->_buildPurchaseUnits($order, $transaction);
 
-        $shippingPreference = isset($requestData['purchase_units'][0]['shipping']) && !empty($requestData['purchase_units'][0]['shipping']) ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING';
+        $shippingPreference = isset($requestData['purchase_units'][0]['shipping']) && !empty($requestData['purchase_units'][0]['shipping']) && isset($requestData['purchase_units'][0]['shipping']['address']) ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING';
 
         $requestData['application_context'] = [
             'brand_name' => $this->brandName,
@@ -507,7 +519,8 @@ class Gateway extends BaseGateway
     // =========================================================================
 
     /**
-     * @param $order
+     * @param Order $order
+     * @param Transaction $transaction
      * @return array
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
@@ -517,8 +530,8 @@ class Gateway extends BaseGateway
             'invoice_id' => $order->reference,
             'custom_id' => $transaction->hash,
             'soft_descriptor' => Craft::$app->getConfig()->getGeneral()->siteName,
-            'amount' => $this->_buildAmount($order),
-            'items' => $this->_buildItems($order),
+            'amount' => $this->_buildAmount($order, $transaction),
+            'items' => $this->_buildItems($order, $transaction),
         ];
 
         $shipping = $this->_buildShipping($order);
@@ -533,16 +546,17 @@ class Gateway extends BaseGateway
 
     /**
      * @param Order $order
+     * @param Transaction $transaction
      * @return array
      */
-    private function _buildAmount(Order $order): array
+    private function _buildAmount(Order $order, Transaction $transaction): array
     {
         $return = [
-            'currency_code' => $order->paymentCurrency,
-            'value' => (string)$order->getOutstandingBalance(),
+            'currency_code' => $transaction->paymentCurrency,
+            'value' => (string)$transaction->paymentAmount,
         ];
 
-        if (!$this->_isPartialPayment($order)) {
+        if (!$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
             $return['breakdown'] = [
                 'item_total' =>
                     [
@@ -576,11 +590,12 @@ class Gateway extends BaseGateway
 
     /**
      * @param Order $order
+     * @param Transaction $transaction
      * @return array
      */
-    private function _buildItems(Order $order): array
+    private function _buildItems(Order $order, Transaction $transaction): array
     {
-        if (!$this->sendCartInfo || $this->_isPartialPayment($order)) {
+        if (!$this->sendCartInfo || $this->_isPartialPayment($order) || !$this->_isPaymentInBaseCurrency($order, $transaction)) {
             return [];
         }
 
@@ -613,21 +628,65 @@ class Gateway extends BaseGateway
 
         $return = [];
 
-        if ($shippingAddress) {
-            $return = [
-                'address' => [
-                    'address_line_1' => $shippingAddress->address1,
-                    'address_line_2' => $shippingAddress->address2,
-                    'admin_area_2' => $shippingAddress->city,
-                    'admin_area_1' => $shippingAddress->stateText,
-                    'postal_code' => $shippingAddress->zipCode,
-                    'country_code' => $shippingAddress->country->iso,
-                ]
+        if ($shippingAddress && $shippingAddress->country) {
+            $return['address'] = [
+                'address_line_1' => $shippingAddress->address1,
+                'address_line_2' => $shippingAddress->address2,
+                'admin_area_2' => $shippingAddress->city,
+                'admin_area_1' => $shippingAddress->stateText,
+                'postal_code' => $shippingAddress->zipCode,
+                'country_code' => $shippingAddress->country->iso,
             ];
+
+            $name = $shippingAddress->fullName ?: $shippingAddress->firstName . ' ' . $shippingAddress->lastName;
+            if ($name) {
+                $return['name'] = ['full_name' => $name];
+            }
         }
 
         if ($shippingAddress && $shippingMethod) {
             $return['method'] = $shippingMethod->name;
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param Order $order
+     * @return array
+     * @since 1.1.0
+     */
+    private function _buildPayer(Order $order): array
+    {
+        /** @var Address $shippingAddress */
+        $billingAddress = $order->billingAddress;
+
+        $return = [
+            'email_address' => $order->email,
+        ];
+
+        $name = [];
+        if ($billingAddress->fullName || $billingAddress->firstName) {
+            $name['given_name'] = $billingAddress->fullName ?: $billingAddress->firstName;
+        }
+
+        if (!$billingAddress->fullName && $billingAddress->lastName) {
+            $name['surname'] = $billingAddress->lastName;
+        }
+
+        if (!empty($name)) {
+            $return['name'] = $name;
+        }
+
+        if ($billingAddress && $billingAddress->country) {
+            $return['address'] = [
+                'address_line_1' => $billingAddress->address1,
+                'address_line_2' => $billingAddress->address2,
+                'admin_area_2' => $billingAddress->city,
+                'admin_area_1' => $billingAddress->stateText,
+                'postal_code' => $billingAddress->zipCode,
+                'country_code' => $billingAddress->country->iso,
+            ];
         }
 
         return $return;
@@ -641,5 +700,47 @@ class Gateway extends BaseGateway
     private function _isPartialPayment(Order $order): bool
     {
         return $order->hasOutstandingBalance() && $order->getOutstandingBalance() < $order->getTotal();
+    }
+
+    /**
+     * @param Order $order
+     * @param Transaction $transaction
+     * @return bool
+     * @since 1.1.0
+     */
+    private function _isPaymentInBaseCurrency(Order $order, Transaction $transaction): bool
+    {
+        return $order->currency == $transaction->paymentCurrency;
+    }
+
+    /**
+     * @param array $passedParams
+     * @return string
+     * @since 1.1.0
+     */
+    private function _sdkQueryParameters(Array $passedParams): string
+    {
+        $passedParamsMergeKeys = [
+            'currency',
+            'disable-card',
+            'disable-funding',
+        ];
+        $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
+        $params = [
+            'client-id' => Craft::parseEnv($this->clientId),
+            'intent' => $intent,
+        ];
+
+        foreach ($passedParamsMergeKeys as $passedParamsMergeKey) {
+            if (isset($passedParams[$passedParamsMergeKey])) {
+                $params[$passedParamsMergeKey] = $passedParams[$passedParamsMergeKey];
+            }
+        }
+
+        foreach ($params as $key => &$param) {
+            $param = $key . '=' . urlencode($param);
+        }
+
+        return implode('&', $params);
     }
 }
