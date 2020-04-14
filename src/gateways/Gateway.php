@@ -494,6 +494,10 @@ class Gateway extends BaseGateway
         $requestData = [];
         $requestData['intent'] = self::PAYMENT_TYPES[$this->paymentType] ?? 'CAPTURE';
 
+        if ($payer = $this->_buildPayer($order)) {
+            $requestData['payer'] = $payer;
+        }
+
         $requestData['purchase_units'] = $this->_buildPurchaseUnits($order, $transaction);
 
         $shippingPreference = isset($requestData['purchase_units'][0]['shipping']) && !empty($requestData['purchase_units'][0]['shipping']) && isset($requestData['purchase_units'][0]['shipping']['address']) ? 'SET_PROVIDED_ADDRESS' : 'NO_SHIPPING';
@@ -625,20 +629,64 @@ class Gateway extends BaseGateway
         $return = [];
 
         if ($shippingAddress && $shippingAddress->country) {
-            $return = [
-                'address' => [
-                    'address_line_1' => $shippingAddress->address1,
-                    'address_line_2' => $shippingAddress->address2,
-                    'admin_area_2' => $shippingAddress->city,
-                    'admin_area_1' => $shippingAddress->stateText,
-                    'postal_code' => $shippingAddress->zipCode,
-                    'country_code' => $shippingAddress->country->iso,
-                ]
+            $return['address'] = [
+                'address_line_1' => $shippingAddress->address1,
+                'address_line_2' => $shippingAddress->address2,
+                'admin_area_2' => $shippingAddress->city,
+                'admin_area_1' => $shippingAddress->stateText,
+                'postal_code' => $shippingAddress->zipCode,
+                'country_code' => $shippingAddress->country->iso,
             ];
+
+            $name = $shippingAddress->fullName ?: $shippingAddress->firstName . ' ' . $shippingAddress->lastName;
+            if ($name) {
+                $return['name'] = ['full_name' => $name];
+            }
         }
 
         if ($shippingAddress && $shippingMethod) {
             $return['method'] = $shippingMethod->name;
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param Order $order
+     * @return array
+     * @since 1.x
+     */
+    private function _buildPayer(Order $order): array
+    {
+        /** @var Address $shippingAddress */
+        $billingAddress = $order->billingAddress;
+
+        $return = [
+            'email_address' => $order->email,
+        ];
+
+        $name = [];
+        if ($billingAddress->fullName || $billingAddress->firstName) {
+            $name['given_name'] = $billingAddress->fullName ?: $billingAddress->firstName;
+        }
+
+        if (!$billingAddress->fullName && $billingAddress->lastName) {
+            $name['surname'] = $billingAddress->lastName;
+        }
+
+        if (!empty($name)) {
+            $return['name'] = $name;
+        }
+
+        if ($billingAddress && $billingAddress->country) {
+            $return['address'] = [
+                'address_line_1' => $billingAddress->address1,
+                'address_line_2' => $billingAddress->address2,
+                'admin_area_2' => $billingAddress->city,
+                'admin_area_1' => $billingAddress->stateText,
+                'postal_code' => $billingAddress->zipCode,
+                'country_code' => $billingAddress->country->iso,
+            ];
         }
 
         return $return;
