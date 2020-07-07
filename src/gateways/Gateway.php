@@ -681,7 +681,7 @@ class Gateway extends BaseGateway
     /**
      * @param Address $address
      * @return array
-     * @since 1.x
+     * @since 1.1.1
      */
     private function _buildAddressArray(Address $address): array
     {
