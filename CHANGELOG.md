@@ -1,9 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.1.1 - 2020-07-07
 
 ### Fixed
-- Fixed a bug that caused the state value not to be populated when passing payer details to PayPal. ([#20](https://github.com/craftcms/commerce-paypal-checkout/issues/20))
+- Fixed a bug that caused state value not to be populated when passing payer details to PayPal. ([#20](https://github.com/craftcms/commerce-paypal-checkout/issues/20))
 
 ## 1.1.0 - 2020-04-14
 
