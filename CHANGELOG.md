@@ -1,6 +1,11 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-### 1.1.0 - 2020-04-14
+## Unreleased
+
+### Fixed
+- Fixed a bug that caused the state value not to be populated when passing payer details to PayPal. ([#20](https://github.com/craftcms/commerce-paypal-checkout/issues/20))
+
+## 1.1.0 - 2020-04-14
 
 ### Added
 - Added the ability to pay in a currency other than the primary payment currency.
