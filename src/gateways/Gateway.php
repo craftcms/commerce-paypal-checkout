@@ -629,14 +629,7 @@ class Gateway extends BaseGateway
         $return = [];
 
         if ($shippingAddress && $shippingAddress->country) {
-            $return['address'] = [
-                'address_line_1' => $shippingAddress->address1,
-                'address_line_2' => $shippingAddress->address2,
-                'admin_area_2' => $shippingAddress->city,
-                'admin_area_1' => $shippingAddress->stateText,
-                'postal_code' => $shippingAddress->zipCode,
-                'country_code' => $shippingAddress->country->iso,
-            ];
+            $return['address'] = $this->_buildAddressArray($shippingAddress);
 
             $name = $shippingAddress->fullName ?: $shippingAddress->firstName . ' ' . $shippingAddress->lastName;
             if ($name) {
@@ -679,17 +672,32 @@ class Gateway extends BaseGateway
         }
 
         if ($billingAddress && $billingAddress->country) {
-            $return['address'] = [
-                'address_line_1' => $billingAddress->address1,
-                'address_line_2' => $billingAddress->address2,
-                'admin_area_2' => $billingAddress->city,
-                'admin_area_1' => $billingAddress->stateText,
-                'postal_code' => $billingAddress->zipCode,
-                'country_code' => $billingAddress->country->iso,
-            ];
+            $return['address'] = $this->_buildAddressArray($billingAddress);
         }
 
         return $return;
+    }
+
+    /**
+     * @param Address $address
+     * @return array
+     * @since 1.1.1
+     */
+    private function _buildAddressArray(Address $address): array
+    {
+        $stateText = $address->stateText;
+        if ($address->stateId && $state = $address->getState()) {
+            $stateText = $state->abbreviation;
+        }
+
+        return [
+            'address_line_1' => $address->address1,
+            'address_line_2' => $address->address2,
+            'admin_area_2' => $address->city,
+            'admin_area_1' => $stateText,
+            'postal_code' => $address->zipCode,
+            'country_code' => $address->country->iso,
+        ];
     }
 
     /**
