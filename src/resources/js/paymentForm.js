@@ -52,20 +52,12 @@ function initPaypalCheckout() {
                 }
             },
             onApprove: function(data, actions) {
-                var form = new FormData();
-                form.append('commerceTransactionHash', transactionHash);
+                var separator = '?';
+                if (completeUrl.indexOf('?') >= 0) {
+                    separator = '&';
+                }
 
-                return fetch(completeUrl, {
-                    method: 'post',
-                    body: form,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }).then(function(res) {
-                    return res.json();
-                }).then(function(data) {
-                    window.location = data.url;
-                });
+                window.location = completeUrl + separator + 'commerceTransactionHash=' + transactionHash;
             }
         }).render('#paypal-button-container');
     }

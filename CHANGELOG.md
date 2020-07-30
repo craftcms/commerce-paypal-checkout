@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Changed
+- Improved redirection after payment has been approved.
+
 ## 1.1.1 - 2020-07-07
 
 ### Fixed
