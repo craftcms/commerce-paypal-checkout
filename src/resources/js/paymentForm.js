@@ -1,28 +1,25 @@
+function findClosestParent (startElement, fn) {
+    var parent = startElement.parentElement;
+    if (!parent) return undefined;
+    return fn(parent) ? parent : findClosestParent(parent, fn);
+}
+
 function initPaypalCheckout() {
     if (typeof paypal_checkout_sdk === "undefined") {
         setTimeout(initPaypalCheckout, 200);
     } else {
-        var $wrapper = $('.paypal-rest-form');
-        var $form = $wrapper.parents('form');
-        var paymentUrl = $wrapper.data('prepare');
-        var completeUrl = $wrapper.data('complete');
+        var $wrapper = document.querySelector('.paypal-rest-form');
+        var $form = findClosestParent($wrapper, function(element) {
+            return element.tagName === 'FORM';
+        });
+        var paymentUrl = $wrapper.dataset.prepare;
+        var completeUrl = $wrapper.dataset.complete;
         var transactionHash;
         var errorShown = false;
 
         paypal_checkout_sdk.Buttons({
             createOrder: function(data, actions) {
-                // Set up the transaction
-                var postData = {};
-                var $formElements = $form.find('input[type=hidden]');
-
-                for (var i = 0; i < $formElements.length; i++) {
-                    if ($formElements[i].name === 'action') {
-                        continue;
-                    }
-                    postData[$formElements[i].name] = $formElements.get(i).value;
-                }
-
-                var form = new FormData($form[0]);
+                var form = new FormData($form);
 
                 return fetch(paymentUrl, {
                     method: 'post',
@@ -47,6 +44,7 @@ function initPaypalCheckout() {
                 });
             },
             onError: function(err) {
+                $form.dataset.processing = false;
                 if (!errorShown) {
                     alert(err);
                 }
