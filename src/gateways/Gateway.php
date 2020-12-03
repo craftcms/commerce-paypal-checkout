@@ -20,6 +20,7 @@ use craft\commerce\models\payments\OffsitePaymentForm;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\models\Transaction;
 use craft\commerce\paypalcheckout\PayPalCheckoutBundle;
+use craft\commerce\paypalcheckout\Plugin as PaypalPlugin;
 use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
@@ -556,7 +557,7 @@ class Gateway extends BaseGateway
             'value' => (string)$transaction->paymentAmount,
         ];
 
-        if (!$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
+        if (PaypalPlugin::getInstance()->getSettings()->sendTotalsBreakdown && !$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
             $return['breakdown'] = [
                 'item_total' =>
                     [
