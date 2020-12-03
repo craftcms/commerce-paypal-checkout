@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Added
+- Added `sendTotalsBreakdown` setting to allow the option not to send a breakdown. ([#25](https://github.com/craftcms/commerce-paypal-checkout/issues/25))
+
 ## 1.1.2 - 2020-10-13
 
 ### Changed
