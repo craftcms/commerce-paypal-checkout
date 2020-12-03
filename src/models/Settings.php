@@ -15,7 +15,7 @@ use craft\base\Model;
  * @property bool $sendTotalsBreakdown
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
- * @since 1.x
+ * @since 1.1.3
  */
 class Settings extends Model
 {
