@@ -61,15 +61,11 @@ To add the PayPal Checkout gateway, go to Commerce → Settings → Gateways, cr
 
 In the gateway settings enter the **client ID** and **secret** for your rest app in their respective fields.
 
-## Configuration settings
+### Cart Info / Cost breakdown
 
-### The `sendTotalsBreakdown` setting
+Turning on the "Send Cart Information" setting for this gateway, the gateway will send cart items and cost breakdown through to PayPal.
 
-By setting this to `false` in your `commerce-paypal-checkout.php` config file you can prevent the plugin from sending the breakdown of the total cost to PayPal. 
-
-**Note:** this is useful if you are using deprecated custom adjuster types.
-
-Default: `true`.
+**Note:** If you are using deprecated custom adjuster types this setting will need be turned off.
 
 ### Paying with non-primary currency
 
