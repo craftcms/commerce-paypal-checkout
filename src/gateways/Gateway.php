@@ -556,7 +556,7 @@ class Gateway extends BaseGateway
             'value' => (string)$transaction->paymentAmount,
         ];
 
-        if (!$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
+        if ($this->sendCartInfo && !$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
             $return['breakdown'] = [
                 'item_total' =>
                     [

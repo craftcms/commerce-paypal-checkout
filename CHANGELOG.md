@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Removed
+- Removed `sendTotalsBreakdown` in favour of using `sendCartInfo` setting. ([#25](https://github.com/craftcms/commerce-paypal-checkout/issues/25))
+
 ## 1.1.3 - 2020-12-03
 
 ### Added

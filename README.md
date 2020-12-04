@@ -61,6 +61,12 @@ To add the PayPal Checkout gateway, go to Commerce → Settings → Gateways, cr
 
 In the gateway settings enter the **client ID** and **secret** for your rest app in their respective fields.
 
+### Cart Info / Cost breakdown
+
+Turning on the "Send Cart Information" setting for this gateway, the gateway will send cart items and cost breakdown through to PayPal.
+
+**Note:** If you are using deprecated custom adjuster types this setting will need be turned off.
+
 ### Paying with non-primary currency
 
 When using the `getPaymentFormHtml()` method (e.g. `cart.gateway.getPaymentFormHtml({})) and allowing payment in a currency other than the primary currency.
