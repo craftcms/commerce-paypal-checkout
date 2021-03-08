@@ -484,6 +484,14 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * @inheritdoc
+     */
+    public function cpPaymentsEnabled(): bool
+    {
+        return false;
+    }
+
+    /**
      * @param Transaction $transaction
      * @return array
      * @throws Exception

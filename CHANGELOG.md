@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Fixed
+- Fixed a bug where the PayPal Checkout gateway was incorrectly showing in the available gateways list for CP payments. ([#30](https://github.com/craftcms/commerce-paypal-checkout/issues/30))
+
 ## 1.2.0 - 2020-12-04
 
 ### Removed
