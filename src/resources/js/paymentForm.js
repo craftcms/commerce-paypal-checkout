@@ -34,11 +34,13 @@ function initPaypalCheckout() {
                         var errorMessage = '';
                         
                         try {
+                            // Handle PayPal errors
                             var error = JSON.parse(data.error);
                             if (error.details && error.details.length) {
                                 errorMessage = error.details[0].description;
                             }
                         } catch (e) {
+                            // Handle Commerce errors
                             errorMessage = data.error;
                         }
                             
