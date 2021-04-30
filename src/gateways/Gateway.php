@@ -737,10 +737,10 @@ class Gateway extends BaseGateway
     private function _sdkQueryParameters(Array $passedParams): string
     {
         $passedParamsMergeKeys = [
-            'locale',
             'currency',
             'disable-card',
             'disable-funding',
+            'locale',
         ];
         $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
         $params = [

@@ -85,7 +85,7 @@ This is required when paying with an alternative payment currency due to the int
 
 This gateway allows the passing of certain query string parameters, at runtime, as specified in the [PayPal documentation](https://developer.paypal.com/docs/checkout/reference/customize-sdk/#query-parameters).
 
-THe allowed parameters are `currency` (as detailed above), `locale`, `disable-card` and `disable-funding`.
+The allowed parameters are `currency` (as detailed above), `disable-card`, `disable-funding` and `locale`.
 
 As an example to disable PayPal credit funding you could output the payment form as follows:
 
