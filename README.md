@@ -47,7 +47,6 @@ REST API credentials include a client ID and secret. Here's how you generate the
 1. Your credentials, the client ID and secret, are displayed on the app details page that displays after you click **Create App**.
 1. Request permissions for REST API features that apply to your integration:
     - PayPal payments
-    - Connect with PayPal
 
 You will now be able to see the **client ID** and **secret** for your newly created app.
 
