@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- Added string error message when an error occurs after the submitting payment information to PayPal Checkout.
+### Added
+- Added the `locale` parameter for when customizing the PayPal SDK script. ([#123](https://github.com/craftcms/commerce-paypal-checkout/pull/35))
+
+### Fixed
+- Fixed a bug where Commerce payment errors weren’t being returned
 
 ### Fixed
 - Fixed a bug where the PayPal Checkout gateway was incorrectly showing in the available gateways list for CP payments. ([#30](https://github.com/craftcms/commerce-paypal-checkout/issues/30))
