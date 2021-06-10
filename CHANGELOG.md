@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.2.1 - 2021-06-10
 
 ### Added
 - Added the `locale` parameter for when customizing the PayPal SDK script. ([#123](https://github.com/craftcms/commerce-paypal-checkout/pull/35))
