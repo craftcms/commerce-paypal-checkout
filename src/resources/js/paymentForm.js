@@ -31,10 +31,20 @@ function initPaypalCheckout() {
                     return res.json();
                 }).then(function(data) {
                     if (data.error) {
-                        var error = JSON.parse(data.error);
-                        if (error.details && error.details.length) {
-                            throw Error(error.details[0].description);
+                        var errorMessage = '';
+                        
+                        try {
+                            // Handle PayPal errors
+                            var error = JSON.parse(data.error);
+                            if (error.details && error.details.length) {
+                                errorMessage = error.details[0].description;
+                            }
+                        } catch (e) {
+                            // Handle Commerce errors
+                            errorMessage = data.error;
                         }
+                            
+                        throw Error(errorMessage);
                     }
                     transactionHash = data.transactionHash;
                     return data.transactionId; // Use the same key name for order ID on the client and server

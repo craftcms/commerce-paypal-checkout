@@ -47,7 +47,6 @@ REST API credentials include a client ID and secret. Here's how you generate the
 1. Your credentials, the client ID and secret, are displayed on the app details page that displays after you click **Create App**.
 1. Request permissions for REST API features that apply to your integration:
     - PayPal payments
-    - Connect with PayPal
 
 You will now be able to see the **client ID** and **secret** for your newly created app.
 
@@ -85,7 +84,7 @@ This is required when paying with an alternative payment currency due to the int
 
 This gateway allows the passing of certain query string parameters, at runtime, as specified in the [PayPal documentation](https://developer.paypal.com/docs/checkout/reference/customize-sdk/#query-parameters).
 
-THe allowed parameters are `currency` (as detailed above), `disable-card` and `disable-funding`.
+The allowed parameters are `currency` (as detailed above), `disable-card`, `disable-funding` and `locale`.
 
 As an example to disable PayPal credit funding you could output the payment form as follows:
 

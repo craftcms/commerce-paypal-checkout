@@ -1,5 +1,15 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## 1.2.1 - 2021-06-10
+
+### Added
+- Added the `locale` parameter for when customizing the PayPal SDK script. ([#123](https://github.com/craftcms/commerce-paypal-checkout/pull/35))
+
+### Fixed
+- Fixed a bug where Commerce payment errors weren’t being returned
+- Fixed a bug where the PayPal Checkout gateway was incorrectly showing in the available gateways list for CP payments. ([#30](https://github.com/craftcms/commerce-paypal-checkout/issues/30))
+- Fixed a bug where the order number wasn’t being sent to PayPal.
+
 ## 1.2.0 - 2020-12-04
 
 ### Removed

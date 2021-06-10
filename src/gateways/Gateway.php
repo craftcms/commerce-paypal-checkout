@@ -484,6 +484,14 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * @inheritdoc
+     */
+    public function cpPaymentsEnabled(): bool
+    {
+        return false;
+    }
+
+    /**
      * @param Transaction $transaction
      * @return array
      * @throws Exception
@@ -527,7 +535,7 @@ class Gateway extends BaseGateway
     {
         $purchaseUnits = [
             'description' => Craft::$app->getConfig()->getGeneral()->siteName,
-            'invoice_id' => $order->reference,
+            'invoice_id' => $order->number,
             'custom_id' => $transaction->hash,
             'soft_descriptor' => Craft::$app->getConfig()->getGeneral()->siteName,
             'amount' => $this->_buildAmount($order, $transaction),
@@ -732,6 +740,7 @@ class Gateway extends BaseGateway
             'currency',
             'disable-card',
             'disable-funding',
+            'locale',
         ];
         $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
         $params = [
