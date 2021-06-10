@@ -535,7 +535,7 @@ class Gateway extends BaseGateway
     {
         $purchaseUnits = [
             'description' => Craft::$app->getConfig()->getGeneral()->siteName,
-            'invoice_id' => $order->reference,
+            'invoice_id' => $order->number,
             'custom_id' => $transaction->hash,
             'soft_descriptor' => Craft::$app->getConfig()->getGeneral()->siteName,
             'amount' => $this->_buildAmount($order, $transaction),

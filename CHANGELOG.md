@@ -7,9 +7,8 @@
 
 ### Fixed
 - Fixed a bug where Commerce payment errors weren’t being returned
-
-### Fixed
 - Fixed a bug where the PayPal Checkout gateway was incorrectly showing in the available gateways list for CP payments. ([#30](https://github.com/craftcms/commerce-paypal-checkout/issues/30))
+- Fixed a bug where the order number wasn’t being sent to PayPal.
 
 ## 1.2.0 - 2020-12-04
 
