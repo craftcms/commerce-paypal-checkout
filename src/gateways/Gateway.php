@@ -24,6 +24,7 @@ use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
 use craft\helpers\ArrayHelper;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Response as WebResponse;
 use craft\web\View;
@@ -527,6 +528,8 @@ class Gateway extends BaseGateway
     // =========================================================================
 
     /**
+     * Build purchase units adhering to the criteria set out in the docs
+     * https://developer.paypal.com/docs/api/orders/v2/#definition-purchase_unit
      * @param Order $order
      * @param Transaction $transaction
      * @return array
@@ -534,10 +537,10 @@ class Gateway extends BaseGateway
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
         $purchaseUnits = [
-            'description' => Craft::$app->getConfig()->getGeneral()->siteName,
-            'invoice_id' => $order->number,
-            'custom_id' => $transaction->hash,
-            'soft_descriptor' => Craft::$app->getConfig()->getGeneral()->siteName,
+            'description' => StringHelper::truncate(Craft::$app->getConfig()->getGeneral()->siteName, 127, ''),
+            'invoice_id' => StringHelper::truncate($order->number, 127, ''),
+            'custom_id' => StringHelper::truncate($transaction->hash, 127, ''),
+            'soft_descriptor' => StringHelper::truncate(StringHelper::regexReplace(Craft::$app->getConfig()->getGeneral()->siteName, "[^a-zA-Z0-9\*\.\-\s]", ''), 22, ''),
             'amount' => $this->_buildAmount($order, $transaction),
             'items' => $this->_buildItems($order, $transaction),
         ];
@@ -597,6 +600,9 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * Build items array adhering to the PayPal API spec
+     * https://developer.paypal.com/docs/api/orders/v2/#definition-item
+     *
      * @param Order $order
      * @param Transaction $transaction
      * @return array
@@ -610,8 +616,8 @@ class Gateway extends BaseGateway
         $lineItems = [];
         foreach ($order->getLineItems() as $lineItem) {
             $lineItems[] = [
-                'name' => $lineItem->description, // required
-                'sku' => $lineItem->sku,
+                'name' => StringHelper::truncate($lineItem->description, 127, ''), // required
+                'sku' => StringHelper::truncate($lineItem->sku, 127, ''),
                 'unit_amount' => [
                         'currency_code' => $order->paymentCurrency,
                         'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
@@ -641,7 +647,7 @@ class Gateway extends BaseGateway
 
             $name = $shippingAddress->fullName ?: $shippingAddress->firstName . ' ' . $shippingAddress->lastName;
             if ($name) {
-                $return['name'] = ['full_name' => $name];
+                $return['name'] = ['full_name' => StringHelper::truncate($name, 300, '')];
             }
         }
 
@@ -653,6 +659,9 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * Build payer data based on APi spec
+     * https://developer.paypal.com/docs/api/orders/v2/#definition-payer
+     *
      * @param Order $order
      * @return array
      * @since 1.1.0
@@ -663,16 +672,16 @@ class Gateway extends BaseGateway
         $billingAddress = $order->billingAddress;
 
         $return = [
-            'email_address' => $order->email,
+            'email_address' => StringHelper::truncate($order->email, 254, ''),
         ];
 
         $name = [];
         if ($billingAddress->fullName || $billingAddress->firstName) {
-            $name['given_name'] = $billingAddress->fullName ?: $billingAddress->firstName;
+            $name['given_name'] = StringHelper::truncate($billingAddress->fullName ?: $billingAddress->firstName, 140, '');
         }
 
         if (!$billingAddress->fullName && $billingAddress->lastName) {
-            $name['surname'] = $billingAddress->lastName;
+            $name['surname'] = StringHelper::truncate($billingAddress->lastName, 140, '');
         }
 
         if (!empty($name)) {
@@ -687,6 +696,9 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * Build address data based on API spec
+     * https://developer.paypal.com/docs/api/orders/v2/#definition-address_portable
+     *
      * @param Address $address
      * @return array
      * @since 1.1.1
@@ -699,11 +711,11 @@ class Gateway extends BaseGateway
         }
 
         return [
-            'address_line_1' => $address->address1,
-            'address_line_2' => $address->address2,
-            'admin_area_2' => $address->city,
-            'admin_area_1' => $stateText,
-            'postal_code' => $address->zipCode,
+            'address_line_1' => StringHelper::truncate($address->address1, 300, ''),
+            'address_line_2' => StringHelper::truncate($address->address2, 300, ''),
+            'admin_area_2' => StringHelper::truncate($address->city, 120, ''),
+            'admin_area_1' => StringHelper::truncate($stateText, 300, ''),
+            'postal_code' => StringHelper::truncate($address->zipCode, 60, ''),
             'country_code' => $address->country->iso,
         ];
     }
