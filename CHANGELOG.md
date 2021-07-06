@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.2.2 - 2021-07-06
 
 ### Fixed
 - Fixed a bug where data submitted to the PayPal API was invalid. ([#39](https://github.com/craftcms/commerce-paypal-checkout/issues/39))
