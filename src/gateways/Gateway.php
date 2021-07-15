@@ -536,7 +536,8 @@ class Gateway extends BaseGateway
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
-        $siteName = Craft::$app->getSites()->getCurrentSite()->getName();
+        // TODO update to `getName()` method when updating the cms requirement.
+        $siteName = Craft::$app->getSites()->getCurrentSite()->name;
         $purchaseUnits = [
             'description' => StringHelper::truncate($siteName, 127, ''),
             'invoice_id' => StringHelper::truncate($order->number, 127, ''),
