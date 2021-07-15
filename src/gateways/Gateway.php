@@ -536,11 +536,12 @@ class Gateway extends BaseGateway
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
+        $siteName = Craft::$app->getSites()->getCurrentSite()->getName();
         $purchaseUnits = [
-            'description' => StringHelper::truncate(Craft::$app->getConfig()->getGeneral()->siteName, 127, ''),
+            'description' => StringHelper::truncate($siteName, 127, ''),
             'invoice_id' => StringHelper::truncate($order->number, 127, ''),
             'custom_id' => StringHelper::truncate($transaction->hash, 127, ''),
-            'soft_descriptor' => StringHelper::truncate(StringHelper::regexReplace(Craft::$app->getConfig()->getGeneral()->siteName, "[^a-zA-Z0-9\*\.\-\s]", ''), 22, ''),
+            'soft_descriptor' => StringHelper::truncate(StringHelper::regexReplace($siteName, "[^a-zA-Z0-9\*\.\-\s]", ''), 22, ''),
             'amount' => $this->_buildAmount($order, $transaction),
             'items' => $this->_buildItems($order, $transaction),
         ];
