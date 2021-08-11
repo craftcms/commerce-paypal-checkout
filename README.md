@@ -27,7 +27,7 @@ cd /path/to/my-project.test
 composer require craftcms/commerce-paypal-checkout
 
 # tell Craft to install the plugin
-./craft install/plugin commerce-paypal-checkout
+./craft plugin/install commerce-paypal-checkout
 ```
 
 ## Setup
