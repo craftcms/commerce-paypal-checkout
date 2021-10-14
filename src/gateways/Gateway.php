@@ -35,6 +35,7 @@ use PayPalCheckoutSdk\Orders\OrdersAuthorizeRequest;
 use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use PayPalCheckoutSdk\Payments\AuthorizationsCaptureRequest;
 use PayPalCheckoutSdk\Payments\CapturesRefundRequest;
+use PayPalHttp\HttpResponse;
 use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -42,16 +43,19 @@ use Twig\Error\SyntaxError;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use yii\base\NotSupportedException;
 
 /**
  * This class represents the PayPal Checkout gateway
  *
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0
+ *
+ * @property-read null|string $settingsHtml
  */
 class Gateway extends BaseGateway
 {
-    const PAYMENT_TYPES = [
+    public const PAYMENT_TYPES = [
         'authorize' => 'AUTHORIZE',
         'purchase' => 'CAPTURE'
     ];
@@ -59,37 +63,37 @@ class Gateway extends BaseGateway
     /**
      * @since 1.1.0
      */
-    CONST SDK_URL = 'https://www.paypal.com/sdk/js';
+    public CONST SDK_URL = 'https://www.paypal.com/sdk/js';
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $clientId;
+    public ?string $clientId = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $secret;
+    public ?string $secret = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $testMode;
+    public ?string $testMode = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $brandName;
+    public ?string $brandName = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $landingPage;
+    public ?string $landingPage = null;
 
     /**
      * @var bool Whether cart information should be sent to the payment gateway
      */
-    public $sendCartInfo = false;
+    public bool $sendCartInfo = false;
 
     /**
      * @inheritdoc
@@ -102,7 +106,7 @@ class Gateway extends BaseGateway
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('commerce-paypal-checkout/settings', ['gateway' => $this]);
     }
@@ -118,7 +122,7 @@ class Gateway extends BaseGateway
      * @throws Exception
      * @throws InvalidConfigException
      */
-    public function getPaymentFormHtml(array $params)
+    public function getPaymentFormHtml(array $params): ?string
     {
         $defaults = [
             'gateway' => $this,
@@ -145,9 +149,10 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * @inheritdoc
+     * @param HttpResponse $data
+     * @return RequestResponseInterface
      */
-    public function getResponseModel($data): RequestResponseInterface
+    public function getResponseModel(HttpResponse $data): RequestResponseInterface
     {
         return new CheckoutResponse($data);
     }
@@ -183,6 +188,7 @@ class Gateway extends BaseGateway
      * @param Transaction $transaction The capture transaction
      * @param string $reference Reference for the transaction being captured.
      * @return RequestResponseInterface
+     * @throws InvalidConfigException
      * @throws PaymentException
      */
     public function capture(Transaction $transaction, string $reference): RequestResponseInterface
@@ -263,10 +269,15 @@ class Gateway extends BaseGateway
      * @param BasePaymentForm $sourceData
      * @param int $userId
      * @return PaymentSource
+     * @throws NotSupportedException
      */
     public function createPaymentSource(BasePaymentForm $sourceData, int $userId): PaymentSource
     {
-        // TODO: Implement createPaymentSource() method.
+        if (!$this->supportsPaymentSources()) {
+            throw new NotSupportedException(Craft::t('commerce', 'Payment sources are not supported by this gateway'));
+        }
+
+        return new PaymentSource();
     }
 
     /**
@@ -274,10 +285,15 @@ class Gateway extends BaseGateway
      *
      * @param string $token
      * @return bool
+     * @throws NotSupportedException
      */
     public function deletePaymentSource($token): bool
     {
-        // TODO: Implement deletePaymentSource() method.
+        if (!$this->supportsPaymentSources()) {
+            throw new NotSupportedException(Craft::t('commerce', 'Payment sources are not supported by this gateway'));
+        }
+
+        return false;
     }
 
     /**
@@ -333,10 +349,11 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Makes an refund request.
+     * Makes a refund request.
      *
      * @param Transaction $transaction The refund transaction
      * @return RequestResponseInterface
+     * @throws InvalidConfigException
      */
     public function refund(Transaction $transaction): RequestResponseInterface
     {
@@ -356,9 +373,9 @@ class Gateway extends BaseGateway
         // the parent was
         $response = json_decode($parentTransaction->response, true);
         if ($parentTransaction->type == 'capture') {
-            $captureId = ArrayHelper::getValue($response, 'result.id', null);
+            $captureId = ArrayHelper::getValue($response, 'result.id');
         } else {
-            $captureId = ArrayHelper::getValue($response, 'result.purchase_units.0.payments.captures.0.id', null);
+            $captureId = ArrayHelper::getValue($response, 'result.purchase_units.0.payments.captures.0.id');
         }
 
         $request = new CapturesRefundRequest($captureId);
@@ -385,7 +402,10 @@ class Gateway extends BaseGateway
      */
     public function processWebHook(): WebResponse
     {
+        $response = Craft::$app->getResponse();
+        $response->data = 'ok';
 
+        return $response;
     }
 
     /**
@@ -521,9 +541,11 @@ class Gateway extends BaseGateway
     /**
      * Build purchase units adhering to the criteria set out in the docs
      * https://developer.paypal.com/docs/api/orders/v2/#definition-purchase_unit
+     *
      * @param Order $order
      * @param Transaction $transaction
      * @return array
+     * @throws \craft\errors\SiteNotFoundException
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
@@ -581,7 +603,7 @@ class Gateway extends BaseGateway
 
             // $discount = $order->getAdjustmentsTotalByType('discount') * -1;
             $discount = $order->getTotalDiscount();
-            if ($discount !== 0) {
+            if ($discount != 0) {
                 $return['breakdown']['discount'] = [
                     'currency_code' => $order->paymentCurrency,
                     'value' => (string)Currency::round($discount * -1), // Needs to be a positive number

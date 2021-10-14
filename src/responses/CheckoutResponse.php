@@ -3,6 +3,7 @@
 namespace craft\commerce\paypalcheckout\responses;
 
 use craft\commerce\base\RequestResponseInterface;
+use PayPalHttp\HttpResponse;
 
 /**
  * PayPal Checkout CheckoutResponse
@@ -17,21 +18,27 @@ class CheckoutResponse implements RequestResponseInterface
     public CONST STATUS_PROCESSING = 'processing';
     public CONST STATUS_SUCCESSFUL = 'successful';
 
-    protected $status;
+    /**
+     * @var string|null
+     */
+    protected ?string $status = null;
 
-    protected $data;
+    /**
+     * @var HttpResponse|null
+     */
+    protected ?HttpResponse $data = null;
 
     /**
      * @var bool
      */
-    private $_processing = false;
+    private bool $_processing = false;
 
     /**
      * Construct the response
      *
-     * @param $data
+     * @param HttpResponse|null $data
      */
-    public function __construct($data) {
+    public function __construct(?HttpResponse $data) {
         $this->data = $data;
     }
 
@@ -57,12 +64,12 @@ class CheckoutResponse implements RequestResponseInterface
     /**
      * @param bool $status
      */
-    public function setProcessing(bool $status)
+    public function setProcessing(bool $status): void
     {
         $this->_processing = $status;
     }
     /**
-     * Returns whether or not the payment was successful.
+     * Returns whether the payment was successful.
      *
      * @return bool
      */
@@ -72,7 +79,7 @@ class CheckoutResponse implements RequestResponseInterface
     }
 
     /**
-     * Returns whether or not the payment is being processed by gateway.
+     * Returns whether the payment is being processed by gateway.
      *
      * @return bool
      */
@@ -82,7 +89,7 @@ class CheckoutResponse implements RequestResponseInterface
     }
 
     /**
-     * Returns whether or not the user needs to be redirected.
+     * Returns whether the user needs to be redirected.
      *
      * @return bool
      */

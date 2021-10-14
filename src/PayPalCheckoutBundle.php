@@ -1,7 +1,7 @@
 <?php
 namespace craft\commerce\paypalcheckout;
 
-use craft\web\AssetBundle;
+use yii\web\AssetBundle;
 
 /**
  * Asset bundle for the PayPal REST payment
