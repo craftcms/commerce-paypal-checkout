@@ -1,12 +1,12 @@
 {% from "_includes/forms" import textField, lightswitchField, selectField, autosuggestField, booleanMenuField, selectizeField %}
 
 {{ booleanMenuField({
-    label: "Should commerce send cart information to gateway when making transactions."|t('commerce'),
-    id: 'sendCartInfo',
-    name: 'sendCartInfo',
-    includeEnvVars: true,
-    errors: gateway.getErrors('sendCartInfo'),
-    value: gateway.sendCartInfo
+  label: 'Send cart information to PayPal when making transactions?'|t('commerce'),
+  id: 'sendCartInfo',
+  name: 'sendCartInfo',
+  includeEnvVars: true,
+  errors: gateway.getErrors('sendCartInfo'),
+  value: gateway.sendCartInfo
 }) }}
 
 {{ autosuggestField({
@@ -20,7 +20,7 @@
 }) }}
 
 {{ autosuggestField({
-  label: "Secret"|t('commerce'),
+  label: 'Secret'|t('commerce'),
   id: 'secret',
   class: 'ltr',
   name: 'secret',
@@ -30,20 +30,20 @@
 }) }}
 
 {{ selectizeField({
-    label: "Landing page"|t('commerce'),
-    name: 'landingPage',
-    options: [
-        { value: 'BILLING', label: "Billing" },
-        { value: 'LOGIN', label: "Login" },
-        { value: 'NO_PREFERENCE', label: "No Preference" }
-    ],
-    includeEnvVars: true,
-    value: gateway.landingPage,
-    errors: gateway.getErrors('landingPage')
+  label: 'Landing Page'|t('commerce'),
+  name: 'landingPage',
+  options: [
+    { value: 'BILLING', label: 'Billing' },
+    { value: 'LOGIN', label: 'Login' },
+    { value: 'NO_PREFERENCE', label: 'No Preference' }
+  ],
+  includeEnvVars: true,
+  value: gateway.landingPage,
+  errors: gateway.getErrors('landingPage')
 }) }}
 
 {{ textField({
-  label: "Brand name"|t('commerce'),
+  label: 'Brand Name'|t('commerce'),
   id: 'brandName',
   class: 'ltr',
   name: 'brandName',
@@ -52,9 +52,9 @@
 }) }}
 
 {{ booleanMenuField({
-    label: "Test mode?"|t('commerce'),
-    name: 'testMode',
-    includeEnvVars: true,
-    errors: gateway.getErrors('testMode'),
-    value: gateway.testMode
+  label: 'Test Mode?'|t('commerce'),
+  name: 'testMode',
+  includeEnvVars: true,
+  errors: gateway.getErrors('testMode'),
+  value: gateway.testMode
 }) }}
