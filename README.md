@@ -5,7 +5,7 @@ This plugin provides a [PayPal Checkout](https://www.paypal.com/uk/webapps/mpp/c
 
 ## Requirements
 
-This plugin requires Craft 3.3.4.1 and Craft Commerce 2.2 or later.
+This plugin requires Craft 3.7.22 and Craft Commerce 2.2 or later.
 
 ## Installation
 
