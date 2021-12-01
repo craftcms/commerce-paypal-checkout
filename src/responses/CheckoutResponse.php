@@ -21,17 +21,10 @@ class CheckoutResponse implements RequestResponseInterface
 
     protected $data;
 
-    // Private Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
     private $_processing = false;
-
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * Construct the response

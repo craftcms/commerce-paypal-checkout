@@ -61,9 +61,6 @@ class Gateway extends BaseGateway
      */
     CONST SDK_URL = 'https://www.paypal.com/sdk/js';
 
-    // Public Properties
-    // =========================================================================
-
     /**
      * @var string
      */
@@ -93,9 +90,6 @@ class Gateway extends BaseGateway
      * @var bool Whether cart information should be sent to the payment gateway
      */
     public $sendCartInfo = false;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -523,9 +517,6 @@ class Gateway extends BaseGateway
 
         return $requestData;
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Build purchase units adhering to the criteria set out in the docs

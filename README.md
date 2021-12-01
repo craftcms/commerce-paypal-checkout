@@ -5,7 +5,7 @@ This plugin provides a [PayPal Checkout](https://www.paypal.com/uk/webapps/mpp/c
 
 ## Requirements
 
-This plugin requires Craft 3.3.4.1 and Craft Commerce 2.2 or later.
+This plugin requires Craft 3.7.22 and Craft Commerce 2.2 or later.
 
 ## Installation
 
@@ -27,7 +27,7 @@ cd /path/to/my-project.test
 composer require craftcms/commerce-paypal-checkout
 
 # tell Craft to install the plugin
-./craft install/plugin commerce-paypal-checkout
+./craft plugin/install commerce-paypal-checkout
 ```
 
 ## Setup

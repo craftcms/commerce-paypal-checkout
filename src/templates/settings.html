@@ -1,11 +1,12 @@
-{% from "_includes/forms" import textField, lightswitchField, selectField, autosuggestField %}
+{% from "_includes/forms" import textField, lightswitchField, selectField, autosuggestField, booleanMenuField, selectizeField %}
 
-{{ lightswitchField({
-  label: "Should commerce send cart information to gateway when making transactions."|t('commerce'),
-  id: 'sendCartInfo',
-  name: 'sendCartInfo',
-  on: gateway.sendCartInfo,
-  errors: gateway.getErrors('sendCartInfo'),
+{{ booleanMenuField({
+    label: "Should commerce send cart information to gateway when making transactions."|t('commerce'),
+    id: 'sendCartInfo',
+    name: 'sendCartInfo',
+    includeEnvVars: true,
+    errors: gateway.getErrors('sendCartInfo'),
+    value: gateway.sendCartInfo
 }) }}
 
 {{ autosuggestField({
@@ -28,23 +29,17 @@
   errors: gateway.getErrors('secret')
 }) }}
 
-{{ lightswitchField({
-  label: "Test mode?"|t('commerce'),
-  name: 'testMode',
-  on: gateway.testMode,
-  errors: gateway.getErrors('testMode'),
-}) }}
-
-{{ selectField({
-  label: "Landing page"|t('commerce'),
-  name: 'landingPage',
-  options: {
-    'BILLING': 'Billing',
-    'LOGIN': 'Login',
-    'NO_PREFERENCE': 'No Preference'
-  },
-  value: gateway.landingPage,
-  errors: gateway.getErrors('landingPage')
+{{ selectizeField({
+    label: "Landing page"|t('commerce'),
+    name: 'landingPage',
+    options: [
+        { value: 'BILLING', label: "Billing" },
+        { value: 'LOGIN', label: "Login" },
+        { value: 'NO_PREFERENCE', label: "No Preference" }
+    ],
+    includeEnvVars: true,
+    value: gateway.landingPage,
+    errors: gateway.getErrors('landingPage')
 }) }}
 
 {{ textField({
@@ -54,4 +49,12 @@
   name: 'brandName',
   value: gateway.brandName,
   errors: gateway.getErrors('brandName')
+}) }}
+
+{{ booleanMenuField({
+    label: "Test mode?"|t('commerce'),
+    name: 'testMode',
+    includeEnvVars: true,
+    errors: gateway.getErrors('testMode'),
+    value: gateway.testMode
 }) }}

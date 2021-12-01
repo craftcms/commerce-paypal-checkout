@@ -1,5 +1,11 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## 1.3.0 - 2021-12-01
+
+### Changed
+- The plugin now requires Craft 3.7.22 or later.
+- The “Test mode?” and “Landing Page” gateway settings now support environment variables.
+
 ## 1.2.2.2 - 2021-07-15
 
 ### Fixed
