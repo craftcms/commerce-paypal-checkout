@@ -46,6 +46,8 @@ use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 /**
  * This class represents the PayPal Checkout gateway
  *
+ * @property bool $sendCartInfo Whether cart information should be sent to the payment gateway
+ * @property bool $testMode Whether Test Mode should be used
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0
  */
@@ -83,13 +85,17 @@ class Gateway extends BaseGateway
 
     /**
      * @var string|bool
+     * @see getSendCartInfo()
+     * @see setSendCartInfo()
      */
-    private $_sendCartInfo;
+    private $_sendCartInfo = false;
 
     /**
      * @var string|bool
+     * @see getTestMode()
+     * @see setTestMode()
      */
-    private $_testMode;
+    private $_testMode = false;
 
     /**
      * @inheritdoc
@@ -104,7 +110,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Returns the gateway’s test mode.
+     * Returns whether Test Mode should be used.
      *
      * @param bool $parse Whether to parse the value as an environment variable
      * @return string|null
@@ -116,7 +122,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Sets the gateway’s test mode.
+     * Sets whether Test Mode should be used.
      *
      * @param string|bool $testMode
      * @since 1.3.1
@@ -127,7 +133,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Whether cart information should be sent to the payment gateway
+     * Returns whether cart information should be sent to the payment gateway.
      *
      * @param bool $parse Whether to parse the value as an environment variable
      * @return string|null
@@ -139,7 +145,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Sets the gateway’s send cart info setting.
+     * Sets whether cart information should be sent to the payment gateway.
      *
      * @param string|bool $sendCartInfo
      * @since 1.3.1
