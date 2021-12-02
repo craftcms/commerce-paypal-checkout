@@ -59,7 +59,7 @@ class Gateway extends BaseGateway
     /**
      * @since 1.1.0
      */
-    CONST SDK_URL = 'https://www.paypal.com/sdk/js';
+    const SDK_URL = 'https://www.paypal.com/sdk/js';
 
     /**
      * @var string
@@ -74,11 +74,6 @@ class Gateway extends BaseGateway
     /**
      * @var string
      */
-    public $testMode;
-
-    /**
-     * @var string
-     */
     public $brandName;
 
     /**
@@ -87,9 +82,72 @@ class Gateway extends BaseGateway
     public $landingPage;
 
     /**
-     * @var bool Whether cart information should be sent to the payment gateway
+     * @var string|bool
      */
-    public $sendCartInfo = false;
+    private $_sendCartInfo;
+
+    /**
+     * @var string|bool
+     */
+    private $_testMode;
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettings(): array
+    {
+        $settings = parent::getSettings();
+        $settings['sendCartInfo'] = $this->getSendCartInfo(false);
+        $settings['testMode'] = $this->getTestMode(false);
+
+        return $settings;
+    }
+
+    /**
+     * Returns the gateway’s test mode.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string|null
+     * @since 1.3.1
+     */
+    public function getTestMode(bool $parse = true)
+    {
+        return $parse ? Craft::parseBooleanEnv($this->_testMode) : $this->_testMode;
+    }
+
+    /**
+     * Sets the gateway’s test mode.
+     *
+     * @param string|bool $testMode
+     * @since 1.3.1
+     */
+    public function setTestMode($testMode): void
+    {
+        $this->_testMode = $testMode;
+    }
+
+    /**
+     * Whether cart information should be sent to the payment gateway
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string|null
+     * @since 1.3.1
+     */
+    public function getSendCartInfo(bool $parse = true)
+    {
+        return $parse ? Craft::parseBooleanEnv($this->_sendCartInfo) : $this->_sendCartInfo;
+    }
+
+    /**
+     * Sets the gateway’s send cart info setting.
+     *
+     * @param string|bool $sendCartInfo
+     * @since 1.3.1
+     */
+    public function setSendCartInfo($sendCartInfo): void
+    {
+        $this->_sendCartInfo = $sendCartInfo;
+    }
 
     /**
      * @inheritdoc
@@ -323,7 +381,7 @@ class Gateway extends BaseGateway
      */
     public function createClient(): PayPalHttpClient
     {
-        if (!$this->testMode) {
+        if (!Craft::parseBooleanEnv($this->testMode)) {
             $environment = new ProductionEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
         } else {
             $environment = new SandboxEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
@@ -521,6 +579,7 @@ class Gateway extends BaseGateway
     /**
      * Build purchase units adhering to the criteria set out in the docs
      * https://developer.paypal.com/docs/api/orders/v2/#definition-purchase_unit
+     *
      * @param Order $order
      * @param Transaction $transaction
      * @return array
@@ -560,7 +619,7 @@ class Gateway extends BaseGateway
             'value' => (string)$transaction->paymentAmount,
         ];
 
-        if ($this->sendCartInfo && !$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
+        if ($this->getSendCartInfo() && !$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
             $return['breakdown'] = [
                 'item_total' =>
                     [
@@ -602,7 +661,7 @@ class Gateway extends BaseGateway
      */
     private function _buildItems(Order $order, Transaction $transaction): array
     {
-        if (!$this->sendCartInfo || $this->_isPartialPayment($order) || !$this->_isPaymentInBaseCurrency($order, $transaction)) {
+        if (!$this->getSendCartInfo() || $this->_isPartialPayment($order) || !$this->_isPaymentInBaseCurrency($order, $transaction)) {
             return [];
         }
 
@@ -612,9 +671,9 @@ class Gateway extends BaseGateway
                 'name' => StringHelper::truncate($lineItem->description, 127, ''), // required
                 'sku' => StringHelper::truncate($lineItem->sku, 127, ''),
                 'unit_amount' => [
-                        'currency_code' => $order->paymentCurrency,
-                        'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
-                    ], // required
+                    'currency_code' => $order->paymentCurrency,
+                    'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
+                ], // required
                 'quantity' => $lineItem->qty, // required
             ];
         }
@@ -739,7 +798,7 @@ class Gateway extends BaseGateway
      * @return string
      * @since 1.1.0
      */
-    private function _sdkQueryParameters(Array $passedParams): string
+    private function _sdkQueryParameters(array $passedParams): string
     {
         $passedParamsMergeKeys = [
             'currency',

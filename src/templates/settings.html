@@ -6,7 +6,7 @@
   name: 'sendCartInfo',
   includeEnvVars: true,
   errors: gateway.getErrors('sendCartInfo'),
-  value: gateway.sendCartInfo
+  value: gateway.getSendCartInfo(false)
 }) }}
 
 {{ autosuggestField({
@@ -56,5 +56,5 @@
   name: 'testMode',
   includeEnvVars: true,
   errors: gateway.getErrors('testMode'),
-  value: gateway.testMode
+  value: gateway.getTestMode(false)
 }) }}
