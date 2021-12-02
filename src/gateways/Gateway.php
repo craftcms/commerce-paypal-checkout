@@ -566,7 +566,7 @@ class Gateway extends BaseGateway
         $requestData['application_context'] = [
             'brand_name' => $this->brandName,
             'locale' => Craft::$app->getLocale()->id,
-            'landing_page' => $this->landingPage,
+            'landing_page' => Craft::parseEnv($this->landingPage),
             'shipping_preference' => $shippingPreference,
             'user_action' => 'PAY_NOW',
             'return_url' => UrlHelper::siteUrl($order->returnUrl),
