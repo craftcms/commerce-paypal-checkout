@@ -113,7 +113,7 @@ class Gateway extends BaseGateway
      *
      * @param bool $parse Whether to parse the value as an environment variable
      * @return string|null
-     * @since 1.3.1
+     * @since 1.3.0.1
      */
     public function getTestMode(bool $parse = true)
     {
@@ -124,7 +124,7 @@ class Gateway extends BaseGateway
      * Sets whether Test Mode should be used.
      *
      * @param string|bool $testMode
-     * @since 1.3.1
+     * @since 1.3.0.1
      */
     public function setTestMode($testMode): void
     {
@@ -136,7 +136,7 @@ class Gateway extends BaseGateway
      *
      * @param bool $parse Whether to parse the value as an environment variable
      * @return string|null
-     * @since 1.3.1
+     * @since 1.3.0.1
      */
     public function getSendCartInfo(bool $parse = true)
     {
@@ -147,7 +147,7 @@ class Gateway extends BaseGateway
      * Sets whether cart information should be sent to the payment gateway.
      *
      * @param string|bool $sendCartInfo
-     * @since 1.3.1
+     * @since 1.3.0.1
      */
     public function setSendCartInfo($sendCartInfo): void
     {
