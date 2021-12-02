@@ -100,13 +100,12 @@ class Gateway extends BaseGateway
     /**
      * @inheritdoc
      */
-    public function getSettings(): array
+    public function attributes(): array
     {
-        $settings = parent::getSettings();
-        $settings['sendCartInfo'] = $this->getSendCartInfo(false);
-        $settings['testMode'] = $this->getTestMode(false);
-
-        return $settings;
+        $attributes = parent::attributes();
+        $attributes[] = 'sendCartInfo';
+        $attributes[] = 'testMode';
+        return $attributes;
     }
 
     /**
