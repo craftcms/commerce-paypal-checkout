@@ -46,6 +46,9 @@ use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 /**
  * This class represents the PayPal Checkout gateway
  *
+ * @property bool $clientId Paypal account Client ID Key
+ * @property bool $secret Paypal account Secret API Key
+ * @property bool $landingPage Landing page
  * @property bool $sendCartInfo Whether cart information should be sent to the payment gateway
  * @property bool $testMode Whether Test Mode should be used
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
@@ -64,26 +67,42 @@ class Gateway extends BaseGateway
     const SDK_URL = 'https://www.paypal.com/sdk/js';
 
     /**
+     * Paypal account Client ID API Key
+     *
      * @var string
+     * @see getClientId()
+     * @see setClientId()
      */
     private $_clientId;
 
     /**
+     * Paypal account Secret API Key
+     *
      * @var string
+     * @see getSecret()
+     * @see setSecret()
      */
     private $_secret;
 
     /**
+     * The label that overrides the business name in the PayPal account on the PayPal pages.
+     *
      * @var string
      */
     public $brandName;
 
     /**
+     * The type of landing page to display on the PayPal site for user checkout. To use the non-PayPal account landing page, set to Billing. To use the PayPal account login landing page, set to Login.
+     *
      * @var string
+     * @see getLandingPage()
+     * @see setLandingPage()
      */
     private $_landingPage;
 
     /**
+     * Whether cart information should be sent to the payment gateway
+     *
      * @var string|bool
      * @see getSendCartInfo()
      * @see setSendCartInfo()
@@ -91,6 +110,8 @@ class Gateway extends BaseGateway
     private $_sendCartInfo = false;
 
     /**
+     * Whether Test Mode should be used
+     *
      * @var string|bool
      * @see getTestMode()
      * @see setTestMode()
@@ -113,7 +134,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Returns the gateway’s client ID.
+     * Returns the gateway’s Client ID API key.
      *
      * @param bool $parse Whether to parse the value as an environment variable
      * @return string
@@ -125,7 +146,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Sets the gateway’s client ID.
+     * Sets the gateway’s Client ID API key.
      *
      * @param string $clientId
      * @since 1.3.1
@@ -135,9 +156,8 @@ class Gateway extends BaseGateway
         $this->_clientId = $clientId;
     }
 
-
     /**
-     * Returns the gateway’s secret.
+     * Returns the gateway’s Secret API key.
      *
      * @param bool $parse Whether to parse the value as an environment variable
      * @return string
@@ -149,7 +169,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Sets the gateway’s secret.
+     * Sets the gateway’s Secret API key.
      *
      * @param string $secret
      * @since 1.3.1
@@ -183,7 +203,6 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Returns the gateway’s test mode.
      * Returns whether Test Mode should be used.
      *
      * @param bool $parse Whether to parse the value as an environment variable
