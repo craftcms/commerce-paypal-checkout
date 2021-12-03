@@ -64,12 +64,12 @@ class Gateway extends BaseGateway
     /**
      * @var string
      */
-    public $clientId;
+    private $_clientId;
 
     /**
      * @var string
      */
-    public $secret;
+    private $_secret;
 
     /**
      * @var string
@@ -79,7 +79,7 @@ class Gateway extends BaseGateway
     /**
      * @var string
      */
-    public $landingPage;
+    private $_landingPage;
 
     /**
      * @var string|bool
@@ -97,10 +97,83 @@ class Gateway extends BaseGateway
     public function getSettings(): array
     {
         $settings = parent::getSettings();
+        $settings['clientId'] = $this->getClientId(false);
+        $settings['secret'] = $this->getSecret(false);
+        $settings['landingPage'] = $this->getLandingPage(false);
         $settings['sendCartInfo'] = $this->getSendCartInfo(false);
         $settings['testMode'] = $this->getTestMode(false);
 
         return $settings;
+    }
+
+    /**
+     * Returns the gateway’s client ID.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string
+     * @since 1.3.1
+     */
+    public function getClientId(bool $parse = true)
+    {
+        return $parse ? Craft::parseEnv($this->_clientId) : $this->_clientId;
+    }
+
+    /**
+     * Sets the gateway’s client ID.
+     *
+     * @param string $clientId
+     * @since 1.3.1
+     */
+    public function setClientId($clientId): void
+    {
+        $this->_clientId = $clientId;
+    }
+
+
+    /**
+     * Returns the gateway’s secret.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string
+     * @since 1.3.1
+     */
+    public function getSecret(bool $parse = true)
+    {
+        return $parse ? Craft::parseEnv($this->_secret) : $this->_secret;
+    }
+
+    /**
+     * Sets the gateway’s secret.
+     *
+     * @param string $secret
+     * @since 1.3.1
+     */
+    public function setSecret($secret): void
+    {
+        $this->_secret = $secret;
+    }
+
+    /**
+     * Returns the gateway’s landing page.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string
+     * @since 1.3.1
+     */
+    public function getLandingPage(bool $parse = true)
+    {
+        return $parse ? Craft::parseEnv($this->_landingPage) : $this->_landingPage;
+    }
+
+    /**
+     * Sets the gateway’s landing page.
+     *
+     * @param string $landingPage
+     * @since 1.3.1
+     */
+    public function setLandingPage($landingPage): void
+    {
+        $this->_landingPage = $landingPage;
     }
 
     /**
@@ -381,10 +454,10 @@ class Gateway extends BaseGateway
      */
     public function createClient(): PayPalHttpClient
     {
-        if (!Craft::parseBooleanEnv($this->testMode)) {
-            $environment = new ProductionEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
+        if (!$this->getTestMode()) {
+            $environment = new ProductionEnvironment($this->getClientId(), $this->getSecret());
         } else {
-            $environment = new SandboxEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
+            $environment = new SandboxEnvironment($this->getClientId(), $this->getSecret());
         }
 
         return new PayPalHttpClient($environment);
@@ -566,7 +639,7 @@ class Gateway extends BaseGateway
         $requestData['application_context'] = [
             'brand_name' => $this->brandName,
             'locale' => Craft::$app->getLocale()->id,
-            'landing_page' => Craft::parseEnv($this->landingPage),
+            'landing_page' => $this->getLandingPage(),
             'shipping_preference' => $shippingPreference,
             'user_action' => 'PAY_NOW',
             'return_url' => UrlHelper::siteUrl($order->returnUrl),
@@ -808,7 +881,7 @@ class Gateway extends BaseGateway
         ];
         $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
         $params = [
-            'client-id' => Craft::parseEnv($this->clientId),
+            'client-id' => $this->getClientId(),
             'intent' => $intent,
         ];
 
