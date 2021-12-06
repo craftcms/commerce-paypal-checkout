@@ -46,9 +46,9 @@ use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 /**
  * This class represents the PayPal Checkout gateway
  *
- * @property bool $clientId Paypal account Client ID Key
- * @property bool $secret Paypal account Secret API Key
- * @property bool $landingPage Landing page
+ * @property string|null $clientId PayPal account client ID
+ * @property string|null $secret PayPal account secret API key
+ * @property string|null $landingPage The gateway’s landing page
  * @property bool $sendCartInfo Whether cart information should be sent to the payment gateway
  * @property bool $testMode Whether Test Mode should be used
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
@@ -67,52 +67,43 @@ class Gateway extends BaseGateway
     const SDK_URL = 'https://www.paypal.com/sdk/js';
 
     /**
-     * Paypal account Client ID API Key
-     *
-     * @var string
+     * @var string|null PayPal account client ID.
      * @see getClientId()
      * @see setClientId()
      */
     private $_clientId;
 
     /**
-     * Paypal account Secret API Key
-     *
-     * @var string
+     * @var string|null PayPal account secret API key.
      * @see getSecret()
      * @see setSecret()
      */
     private $_secret;
 
     /**
-     * The label that overrides the business name in the PayPal account on the PayPal pages.
-     *
-     * @var string
+     * @var string The label that overrides the business name on off-site PayPal pages.
      */
     public $brandName;
 
     /**
-     * The type of landing page to display on the PayPal site for user checkout. To use the non-PayPal account landing page, set to Billing. To use the PayPal account login landing page, set to Login.
+     * @var string|null The type of landing page to display on the PayPal site for user checkout.
      *
-     * @var string
+     * To use the non-PayPal account landing page, set to `Billing`. To use the PayPal account login landing page, set to `Login`.
+     *
      * @see getLandingPage()
      * @see setLandingPage()
      */
     private $_landingPage;
 
     /**
-     * Whether cart information should be sent to the payment gateway
-     *
-     * @var string|bool
+     * @var bool|string Whether cart information should be sent to the payment gateway
      * @see getSendCartInfo()
      * @see setSendCartInfo()
      */
     private $_sendCartInfo = false;
 
     /**
-     * Whether Test Mode should be used
-     *
-     * @var string|bool
+     * @var bool|string Whether Test Mode should be used
      * @see getTestMode()
      * @see setTestMode()
      */
@@ -129,52 +120,51 @@ class Gateway extends BaseGateway
         $settings['landingPage'] = $this->getLandingPage(false);
         $settings['sendCartInfo'] = $this->getSendCartInfo(false);
         $settings['testMode'] = $this->getTestMode(false);
-
         return $settings;
     }
 
     /**
-     * Returns the gateway’s Client ID API key.
+     * Returns the gateway’s client ID.
      *
      * @param bool $parse Whether to parse the value as an environment variable
-     * @return string
+     * @return string|null
      * @since 1.3.1
      */
-    public function getClientId(bool $parse = true)
+    public function getClientId(bool $parse = true): ?string
     {
         return $parse ? Craft::parseEnv($this->_clientId) : $this->_clientId;
     }
 
     /**
-     * Sets the gateway’s Client ID API key.
+     * Sets the gateway’s client ID.
      *
-     * @param string $clientId
+     * @param string|null $clientId
      * @since 1.3.1
      */
-    public function setClientId($clientId): void
+    public function setClientId(?string $clientId): void
     {
         $this->_clientId = $clientId;
     }
 
     /**
-     * Returns the gateway’s Secret API key.
+     * Returns the gateway’s secret API key.
      *
      * @param bool $parse Whether to parse the value as an environment variable
-     * @return string
+     * @return string|null
      * @since 1.3.1
      */
-    public function getSecret(bool $parse = true)
+    public function getSecret(bool $parse = true): ?string
     {
         return $parse ? Craft::parseEnv($this->_secret) : $this->_secret;
     }
 
     /**
-     * Sets the gateway’s Secret API key.
+     * Sets the gateway’s secret API key.
      *
-     * @param string $secret
+     * @param string|null $secret
      * @since 1.3.1
      */
-    public function setSecret($secret): void
+    public function setSecret(?string $secret): void
     {
         $this->_secret = $secret;
     }
@@ -183,10 +173,10 @@ class Gateway extends BaseGateway
      * Returns the gateway’s landing page.
      *
      * @param bool $parse Whether to parse the value as an environment variable
-     * @return string
+     * @return string|null
      * @since 1.3.1
      */
-    public function getLandingPage(bool $parse = true)
+    public function getLandingPage(bool $parse = true): ?string
     {
         return $parse ? Craft::parseEnv($this->_landingPage) : $this->_landingPage;
     }
@@ -194,10 +184,10 @@ class Gateway extends BaseGateway
     /**
      * Sets the gateway’s landing page.
      *
-     * @param string $landingPage
+     * @param string|null $landingPage
      * @since 1.3.1
      */
-    public function setLandingPage($landingPage): void
+    public function setLandingPage(?string $landingPage): void
     {
         $this->_landingPage = $landingPage;
     }
@@ -206,7 +196,7 @@ class Gateway extends BaseGateway
      * Returns whether Test Mode should be used.
      *
      * @param bool $parse Whether to parse the value as an environment variable
-     * @return string|null
+     * @return bool|string
      * @since 1.3.1
      */
     public function getTestMode(bool $parse = true)
@@ -229,7 +219,7 @@ class Gateway extends BaseGateway
      * Returns whether cart information should be sent to the payment gateway.
      *
      * @param bool $parse Whether to parse the value as an environment variable
-     * @return string|null
+     * @return bool|string
      * @since 1.3.1
      */
     public function getSendCartInfo(bool $parse = true)
@@ -240,7 +230,7 @@ class Gateway extends BaseGateway
     /**
      * Sets whether cart information should be sent to the payment gateway.
      *
-     * @param string|bool $sendCartInfo
+     * @param bool|string $sendCartInfo
      * @since 1.3.1
      */
     public function setSendCartInfo($sendCartInfo): void
