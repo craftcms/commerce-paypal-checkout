@@ -6,7 +6,7 @@
   name: 'sendCartInfo',
   includeEnvVars: true,
   errors: gateway.getErrors('sendCartInfo'),
-  value: gateway.sendCartInfo
+  value: gateway.getSendCartInfo(false)
 }) }}
 
 {{ autosuggestField({
@@ -15,7 +15,7 @@
   class: 'ltr',
   name: 'clientId',
   suggestEnvVars: true,
-  value: gateway.clientId,
+  value: gateway.getClientId(false),
   errors: gateway.getErrors('clientId')
 }) }}
 
@@ -25,7 +25,7 @@
   class: 'ltr',
   name: 'secret',
   suggestEnvVars: true,
-  value: gateway.secret,
+  value: gateway.getSecret(false),
   errors: gateway.getErrors('secret')
 }) }}
 
@@ -38,7 +38,7 @@
     { value: 'NO_PREFERENCE', label: 'No Preference' }
   ],
   includeEnvVars: true,
-  value: gateway.landingPage,
+  value: gateway.getLandingPage(false),
   errors: gateway.getErrors('landingPage')
 }) }}
 
@@ -56,5 +56,5 @@
   name: 'testMode',
   includeEnvVars: true,
   errors: gateway.getErrors('testMode'),
-  value: gateway.testMode
+  value: gateway.getTestMode(false)
 }) }}
