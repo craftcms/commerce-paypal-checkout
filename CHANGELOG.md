@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.3.1 - 2021-12-07
 
 ### Added
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::getClientId()`.
