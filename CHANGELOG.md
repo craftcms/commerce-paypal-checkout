@@ -1,5 +1,22 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Added
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getClientId()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setClientId()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getSecret()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setSecret()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getSendCartInfo()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setSendCartInfo()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getTestMode()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setTestMode()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getLandingLage()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setLandingLage()`.
+
+### Fixed
+- Fixed a bug where “Send Gateway Info”, “Test mode?” and “Landing Page” gateway settings were not being parsed as environment variables.
+
 ## 1.3.0 - 2021-12-01
 
 ### Changed

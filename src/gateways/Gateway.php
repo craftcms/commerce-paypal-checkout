@@ -46,6 +46,11 @@ use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 /**
  * This class represents the PayPal Checkout gateway
  *
+ * @property string|null $clientId PayPal account client ID
+ * @property string|null $secret PayPal account secret API key
+ * @property string|null $landingPage The gateway’s landing page
+ * @property bool $sendCartInfo Whether cart information should be sent to the payment gateway
+ * @property bool $testMode Whether Test Mode should be used
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0
  */
@@ -59,37 +64,179 @@ class Gateway extends BaseGateway
     /**
      * @since 1.1.0
      */
-    CONST SDK_URL = 'https://www.paypal.com/sdk/js';
+    const SDK_URL = 'https://www.paypal.com/sdk/js';
 
     /**
-     * @var string
+     * @var string|null PayPal account client ID.
+     * @see getClientId()
+     * @see setClientId()
      */
-    public $clientId;
+    private $_clientId;
 
     /**
-     * @var string
+     * @var string|null PayPal account secret API key.
+     * @see getSecret()
+     * @see setSecret()
      */
-    public $secret;
+    private $_secret;
 
     /**
-     * @var string
-     */
-    public $testMode;
-
-    /**
-     * @var string
+     * @var string The label that overrides the business name on off-site PayPal pages.
      */
     public $brandName;
 
     /**
-     * @var string
+     * @var string|null The type of landing page to display on the PayPal site for user checkout.
+     *
+     * To use the non-PayPal account landing page, set to `Billing`. To use the PayPal account login landing page, set to `Login`.
+     *
+     * @see getLandingPage()
+     * @see setLandingPage()
      */
-    public $landingPage;
+    private $_landingPage;
 
     /**
-     * @var bool Whether cart information should be sent to the payment gateway
+     * @var bool|string Whether cart information should be sent to the payment gateway
+     * @see getSendCartInfo()
+     * @see setSendCartInfo()
      */
-    public $sendCartInfo = false;
+    private $_sendCartInfo = false;
+
+    /**
+     * @var bool|string Whether Test Mode should be used
+     * @see getTestMode()
+     * @see setTestMode()
+     */
+    private $_testMode = false;
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettings(): array
+    {
+        $settings = parent::getSettings();
+        $settings['clientId'] = $this->getClientId(false);
+        $settings['secret'] = $this->getSecret(false);
+        $settings['landingPage'] = $this->getLandingPage(false);
+        $settings['sendCartInfo'] = $this->getSendCartInfo(false);
+        $settings['testMode'] = $this->getTestMode(false);
+        return $settings;
+    }
+
+    /**
+     * Returns the gateway’s client ID.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string|null
+     * @since 1.3.1
+     */
+    public function getClientId(bool $parse = true): ?string
+    {
+        return $parse ? Craft::parseEnv($this->_clientId) : $this->_clientId;
+    }
+
+    /**
+     * Sets the gateway’s client ID.
+     *
+     * @param string|null $clientId
+     * @since 1.3.1
+     */
+    public function setClientId(?string $clientId): void
+    {
+        $this->_clientId = $clientId;
+    }
+
+    /**
+     * Returns the gateway’s secret API key.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string|null
+     * @since 1.3.1
+     */
+    public function getSecret(bool $parse = true): ?string
+    {
+        return $parse ? Craft::parseEnv($this->_secret) : $this->_secret;
+    }
+
+    /**
+     * Sets the gateway’s secret API key.
+     *
+     * @param string|null $secret
+     * @since 1.3.1
+     */
+    public function setSecret(?string $secret): void
+    {
+        $this->_secret = $secret;
+    }
+
+    /**
+     * Returns the gateway’s landing page.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string|null
+     * @since 1.3.1
+     */
+    public function getLandingPage(bool $parse = true): ?string
+    {
+        return $parse ? Craft::parseEnv($this->_landingPage) : $this->_landingPage;
+    }
+
+    /**
+     * Sets the gateway’s landing page.
+     *
+     * @param string|null $landingPage
+     * @since 1.3.1
+     */
+    public function setLandingPage(?string $landingPage): void
+    {
+        $this->_landingPage = $landingPage;
+    }
+
+    /**
+     * Returns whether Test Mode should be used.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return bool|string
+     * @since 1.3.1
+     */
+    public function getTestMode(bool $parse = true)
+    {
+        return $parse ? Craft::parseBooleanEnv($this->_testMode) : $this->_testMode;
+    }
+
+    /**
+     * Sets whether Test Mode should be used.
+     *
+     * @param string|bool $testMode
+     * @since 1.3.1
+     */
+    public function setTestMode($testMode): void
+    {
+        $this->_testMode = $testMode;
+    }
+
+    /**
+     * Returns whether cart information should be sent to the payment gateway.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return bool|string
+     * @since 1.3.1
+     */
+    public function getSendCartInfo(bool $parse = true)
+    {
+        return $parse ? Craft::parseBooleanEnv($this->_sendCartInfo) : $this->_sendCartInfo;
+    }
+
+    /**
+     * Sets whether cart information should be sent to the payment gateway.
+     *
+     * @param bool|string $sendCartInfo
+     * @since 1.3.1
+     */
+    public function setSendCartInfo($sendCartInfo): void
+    {
+        $this->_sendCartInfo = $sendCartInfo;
+    }
 
     /**
      * @inheritdoc
@@ -323,10 +470,10 @@ class Gateway extends BaseGateway
      */
     public function createClient(): PayPalHttpClient
     {
-        if (!$this->testMode) {
-            $environment = new ProductionEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
+        if (!$this->getTestMode()) {
+            $environment = new ProductionEnvironment($this->getClientId(), $this->getSecret());
         } else {
-            $environment = new SandboxEnvironment(Craft::parseEnv($this->clientId), Craft::parseEnv($this->secret));
+            $environment = new SandboxEnvironment($this->getClientId(), $this->getSecret());
         }
 
         return new PayPalHttpClient($environment);
@@ -508,7 +655,7 @@ class Gateway extends BaseGateway
         $requestData['application_context'] = [
             'brand_name' => $this->brandName,
             'locale' => Craft::$app->getLocale()->id,
-            'landing_page' => $this->landingPage,
+            'landing_page' => $this->getLandingPage(),
             'shipping_preference' => $shippingPreference,
             'user_action' => 'PAY_NOW',
             'return_url' => UrlHelper::siteUrl($order->returnUrl),
@@ -521,6 +668,7 @@ class Gateway extends BaseGateway
     /**
      * Build purchase units adhering to the criteria set out in the docs
      * https://developer.paypal.com/docs/api/orders/v2/#definition-purchase_unit
+     *
      * @param Order $order
      * @param Transaction $transaction
      * @return array
@@ -560,7 +708,7 @@ class Gateway extends BaseGateway
             'value' => (string)$transaction->paymentAmount,
         ];
 
-        if ($this->sendCartInfo && !$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
+        if ($this->getSendCartInfo() && !$this->_isPartialPayment($order) && $this->_isPaymentInBaseCurrency($order, $transaction)) {
             $return['breakdown'] = [
                 'item_total' =>
                     [
@@ -602,7 +750,7 @@ class Gateway extends BaseGateway
      */
     private function _buildItems(Order $order, Transaction $transaction): array
     {
-        if (!$this->sendCartInfo || $this->_isPartialPayment($order) || !$this->_isPaymentInBaseCurrency($order, $transaction)) {
+        if (!$this->getSendCartInfo() || $this->_isPartialPayment($order) || !$this->_isPaymentInBaseCurrency($order, $transaction)) {
             return [];
         }
 
@@ -612,9 +760,9 @@ class Gateway extends BaseGateway
                 'name' => StringHelper::truncate($lineItem->description, 127, ''), // required
                 'sku' => StringHelper::truncate($lineItem->sku, 127, ''),
                 'unit_amount' => [
-                        'currency_code' => $order->paymentCurrency,
-                        'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
-                    ], // required
+                    'currency_code' => $order->paymentCurrency,
+                    'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
+                ], // required
                 'quantity' => $lineItem->qty, // required
             ];
         }
@@ -739,7 +887,7 @@ class Gateway extends BaseGateway
      * @return string
      * @since 1.1.0
      */
-    private function _sdkQueryParameters(Array $passedParams): string
+    private function _sdkQueryParameters(array $passedParams): string
     {
         $passedParamsMergeKeys = [
             'currency',
@@ -749,7 +897,7 @@ class Gateway extends BaseGateway
         ];
         $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
         $params = [
-            'client-id' => Craft::parseEnv($this->clientId),
+            'client-id' => $this->getClientId(),
             'intent' => $intent,
         ];
 
