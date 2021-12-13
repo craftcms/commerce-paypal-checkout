@@ -804,17 +804,25 @@ class Gateway extends BaseGateway
      * https://developer.paypal.com/docs/api/orders/v2/#definition-payer
      *
      * @param Order $order
-     * @return array
+     * @return ?array
      * @since 1.1.0
      */
-    private function _buildPayer(Order $order): array
+    private function _buildPayer(Order $order): ?array
     {
-        /** @var Address $shippingAddress */
+        /** @var Address $billingAddress */
         $billingAddress = $order->billingAddress;
+
+        if (!$billingAddress && !$order->email) {
+            return null;
+        }
 
         $return = [
             'email_address' => StringHelper::truncate($order->email, 254, ''),
         ];
+
+        if (!$billingAddress) {
+            return $return;
+        }
 
         $name = [];
         if ($billingAddress->fullName || $billingAddress->firstName) {
@@ -829,7 +837,8 @@ class Gateway extends BaseGateway
             $return['name'] = $name;
         }
 
-        if ($billingAddress && $billingAddress->country) {
+        // To meet PayPal's requirements, the country must exist on the address
+        if ($billingAddress->country) {
             $return['address'] = $this->_buildAddressArray($billingAddress);
         }
 
