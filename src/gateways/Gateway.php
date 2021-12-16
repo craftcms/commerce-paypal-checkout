@@ -413,7 +413,7 @@ class Gateway extends BaseGateway
      */
     public function createPaymentSource(BasePaymentForm $sourceData, int $userId): PaymentSource
     {
-        // TODO: Implement createPaymentSource() method.
+        return new PaymentSource();
     }
 
     /**
@@ -424,7 +424,7 @@ class Gateway extends BaseGateway
      */
     public function deletePaymentSource($token): bool
     {
-        // TODO: Implement deletePaymentSource() method.
+        return false;
     }
 
     /**
@@ -480,10 +480,11 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Makes an refund request.
+     * Makes a refund request.
      *
      * @param Transaction $transaction The refund transaction
      * @return RequestResponseInterface
+     * @throws \Exception
      */
     public function refund(Transaction $transaction): RequestResponseInterface
     {
@@ -532,7 +533,11 @@ class Gateway extends BaseGateway
      */
     public function processWebHook(): WebResponse
     {
-
+        // Create response even though it, currently, is not used
+        $response = new WebResponse();
+        $response->setStatusCode(200);
+        $response->content = 'OK';
+        return $response;
     }
 
     /**
