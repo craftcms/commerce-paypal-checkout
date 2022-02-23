@@ -24,6 +24,7 @@ use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Response as WebResponse;
@@ -393,15 +394,26 @@ class Gateway extends BaseGateway
     public function completePurchase(Transaction $transaction): RequestResponseInterface
     {
         $request = new OrdersCaptureRequest($transaction->reference);
+        $request->prefer('return=representation');
         $client = $this->createClient();
 
         try {
-            $apiResponse = $client->execute($request);
+            $data = $client->execute($request);
         } catch (\Exception $e) {
-            throw new PaymentException($e->getMessage());
+            $message = $e->getMessage();
+            $message = Json::isJsonObject($message) ? Json::decode($message) : $message;
+
+            $data = (object)[
+                'statusCode' => $e->statusCode ?? 400,
+                'result' => (object)[
+                    'id' => $transaction->reference,
+                    'message' => is_array($message) && isset($message['message']) ? $message['message'] : $message,
+                    'status' => CheckoutResponse::STATUS_ERROR,
+                ],
+            ];
         }
 
-        return $this->getResponseModel($apiResponse);
+        return $this->getResponseModel($data);
     }
 
     /**
