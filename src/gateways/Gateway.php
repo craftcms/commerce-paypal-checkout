@@ -24,6 +24,7 @@ use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Response as WebResponse;
@@ -393,15 +394,26 @@ class Gateway extends BaseGateway
     public function completePurchase(Transaction $transaction): RequestResponseInterface
     {
         $request = new OrdersCaptureRequest($transaction->reference);
+        $request->prefer('return=representation');
         $client = $this->createClient();
 
         try {
-            $apiResponse = $client->execute($request);
+            $data = $client->execute($request);
         } catch (\Exception $e) {
-            throw new PaymentException($e->getMessage());
+            $message = $e->getMessage();
+            $message = Json::isJsonObject($message) ? Json::decode($message) : $message;
+
+            $data = (object)[
+                'statusCode' => $e->statusCode ?? 400,
+                'result' => (object)[
+                    'id' => $transaction->reference,
+                    'message' => is_array($message) && isset($message['message']) ? $message['message'] : $message,
+                    'status' => CheckoutResponse::STATUS_ERROR,
+                ],
+            ];
         }
 
-        return $this->getResponseModel($apiResponse);
+        return $this->getResponseModel($data);
     }
 
     /**
@@ -413,7 +425,7 @@ class Gateway extends BaseGateway
      */
     public function createPaymentSource(BasePaymentForm $sourceData, int $userId): PaymentSource
     {
-        // TODO: Implement createPaymentSource() method.
+        return new PaymentSource();
     }
 
     /**
@@ -424,7 +436,7 @@ class Gateway extends BaseGateway
      */
     public function deletePaymentSource($token): bool
     {
-        // TODO: Implement deletePaymentSource() method.
+        return false;
     }
 
     /**
@@ -480,10 +492,11 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * Makes an refund request.
+     * Makes a refund request.
      *
      * @param Transaction $transaction The refund transaction
      * @return RequestResponseInterface
+     * @throws \Exception
      */
     public function refund(Transaction $transaction): RequestResponseInterface
     {
@@ -532,7 +545,11 @@ class Gateway extends BaseGateway
      */
     public function processWebHook(): WebResponse
     {
-
+        // Create response even though it, currently, is not used
+        $response = new WebResponse();
+        $response->setStatusCode(200);
+        $response->content = 'OK';
+        return $response;
     }
 
     /**
@@ -804,17 +821,25 @@ class Gateway extends BaseGateway
      * https://developer.paypal.com/docs/api/orders/v2/#definition-payer
      *
      * @param Order $order
-     * @return array
+     * @return ?array
      * @since 1.1.0
      */
-    private function _buildPayer(Order $order): array
+    private function _buildPayer(Order $order): ?array
     {
-        /** @var Address $shippingAddress */
+        /** @var Address $billingAddress */
         $billingAddress = $order->billingAddress;
+
+        if (!$billingAddress && !$order->email) {
+            return null;
+        }
 
         $return = [
             'email_address' => StringHelper::truncate($order->email, 254, ''),
         ];
+
+        if (!$billingAddress) {
+            return $return;
+        }
 
         $name = [];
         if ($billingAddress->fullName || $billingAddress->firstName) {
@@ -829,7 +854,8 @@ class Gateway extends BaseGateway
             $return['name'] = $name;
         }
 
-        if ($billingAddress && $billingAddress->country) {
+        // To meet PayPal's requirements, the country must exist on the address
+        if ($billingAddress->country) {
             $return['address'] = $this->_buildAddressArray($billingAddress);
         }
 

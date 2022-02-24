@@ -3,6 +3,7 @@
 namespace craft\commerce\paypalcheckout\responses;
 
 use craft\commerce\base\RequestResponseInterface;
+use craft\helpers\Json;
 
 /**
  * PayPal Checkout CheckoutResponse
@@ -13,12 +14,19 @@ use craft\commerce\base\RequestResponseInterface;
  */
 class CheckoutResponse implements RequestResponseInterface
 {
+    public CONST STATUS_ERROR = 'error';
     public CONST STATUS_REDIRECT = 'redirect';
     public CONST STATUS_PROCESSING = 'processing';
     public CONST STATUS_SUCCESSFUL = 'successful';
 
+    /**
+     * @var
+     */
     protected $status;
 
+    /**
+     * @var
+     */
     protected $data;
 
     /**
@@ -27,12 +35,21 @@ class CheckoutResponse implements RequestResponseInterface
     private $_processing = false;
 
     /**
+     * @var string
+     */
+    private $_message = '';
+
+    /**
      * Construct the response
      *
      * @param $data
      */
     public function __construct($data) {
         $this->data = $data;
+
+        if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
+            $this->setMessage($this->data->result->message);
+        }
     }
 
     /**
@@ -50,6 +67,8 @@ class CheckoutResponse implements RequestResponseInterface
             if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
                 $this->status = self::STATUS_PROCESSING;
             }
+        } else if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
+            $this->status = self::STATUS_ERROR;
         }
 
         return $this->status;
@@ -62,34 +81,34 @@ class CheckoutResponse implements RequestResponseInterface
         $this->_processing = $status;
     }
     /**
-     * Returns whether or not the payment was successful.
+     * Returns whether the payment was successful.
      *
      * @return bool
      */
     public function isSuccessful(): bool
     {
-        return $this->getStatus() == self::STATUS_SUCCESSFUL;
+        return $this->getStatus() === self::STATUS_SUCCESSFUL;
     }
 
     /**
-     * Returns whether or not the payment is being processed by gateway.
+     * Returns whether the payment is being processed by gateway.
      *
      * @return bool
      */
     public function isProcessing(): bool
     {
-        return $this->getStatus() == self::STATUS_PROCESSING;
+        return $this->getStatus() === self::STATUS_PROCESSING;
     }
 
     /**
-     * Returns whether or not the user needs to be redirected.
+     * Returns whether the user needs to be redirected.
      *
      * @return bool
      */
     public function isRedirect(): bool
     {
         // Only redirect when we are creating the transaction
-        return !$this->isSuccessful();
+        return $this->getStatus() === self::STATUS_REDIRECT;
     }
 
     /**
@@ -153,13 +172,22 @@ class CheckoutResponse implements RequestResponseInterface
     }
 
     /**
+     * @param string $message
+     * @return void
+     */
+    public function setMessage(string $message): void
+    {
+        $this->_message = $message;
+    }
+
+    /**
      * Returns the gateway message.
      *
      * @return string
      */
     public function getMessage(): string
     {
-        return '';
+        return $this->_message;
     }
 
     /**
