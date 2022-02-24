@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.3.2 - 2022-02-24
 
 ### Fixed
 - Fixed an error that could occur when no billing address was provided. ([#48](https://github.com/craftcms/commerce-paypal-checkout/issues/48))
