@@ -505,11 +505,14 @@ class Gateway extends BaseGateway
             Craft::error('Cannot retrieve parent transaction', __METHOD__);
         }
 
+        $paymentCurrency = Plugin::getInstance()->getPaymentCurrencies()->getPaymentCurrencyByIso($transaction->paymentCurrency);
+        $amountValue = $paymentCurrency ? Currency::round($transaction->paymentAmount, $paymentCurrency) : $transaction->paymentAmount;
+
         $body = [
             'amount' => [
-                'value' => $transaction->paymentAmount,
+                'value' => (string)$amountValue,
                 'currency_code' => $transaction->paymentCurrency
-            ]
+            ],
         ];
 
         // Get the data from different locations based on which type of transaction
