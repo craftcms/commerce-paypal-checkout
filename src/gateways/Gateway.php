@@ -36,6 +36,9 @@ use PayPalCheckoutSdk\Orders\OrdersAuthorizeRequest;
 use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
 use PayPalCheckoutSdk\Payments\AuthorizationsCaptureRequest;
 use PayPalCheckoutSdk\Payments\CapturesRefundRequest;
+use PayPalHttp\HttpException;
+use PayPalHttp\HttpResponse;
+use PayPalHttp\IOException;
 use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -293,7 +296,8 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * @inheritdoc
+     * @param HttpResponse $data
+     * @return RequestResponseInterface
      */
     public function getResponseModel($data): RequestResponseInterface
     {
@@ -301,7 +305,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * @param $data
+     * @param HttpResponse|array $data
      * @return RefundResponse
      */
     public function getRefundResponseModel($data): RefundResponse
@@ -399,12 +403,12 @@ class Gateway extends BaseGateway
 
         try {
             $data = $client->execute($request);
-        } catch (\Exception $e) {
+        } catch (HttpException|IOException $e) {
             $message = $e->getMessage();
             $message = Json::isJsonObject($message) ? Json::decode($message) : $message;
 
             $data = (object)[
-                'statusCode' => $e->statusCode ?? 400,
+                'statusCode' => $e instanceof HttpException ? $e->statusCode : 400,
                 'result' => (object)[
                     'id' => $transaction->reference,
                     'message' => is_array($message) && isset($message['message']) ? $message['message'] : $message,
@@ -532,11 +536,8 @@ class Gateway extends BaseGateway
         try {
             $apiResponse = $client->execute($request);
             return $this->getRefundResponseModel($apiResponse);
-        } catch (\Exception $e) {
-
-            return $this->getRefundResponseModel([
-                'message' => $e->getMessage()
-            ]);
+        } catch (HttpException|IOException $e) {
+            return $this->getRefundResponseModel(new HttpResponse(0, Json::decodeIfJson($e->getMessage()), []));
         }
     }
 
@@ -777,8 +778,8 @@ class Gateway extends BaseGateway
         $lineItems = [];
         foreach ($order->getLineItems() as $lineItem) {
             $lineItems[] = [
-                'name' => StringHelper::truncate($lineItem->description, 127, ''), // required
-                'sku' => StringHelper::truncate($lineItem->sku, 127, ''),
+                'name' => StringHelper::truncate($lineItem->getDescription(), 127, ''), // required
+                'sku' => StringHelper::truncate($lineItem->getSku(), 127, ''),
                 'unit_amount' => [
                     'currency_code' => $order->paymentCurrency,
                     'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),

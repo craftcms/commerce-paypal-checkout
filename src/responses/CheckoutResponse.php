@@ -4,6 +4,7 @@ namespace craft\commerce\paypalcheckout\responses;
 
 use craft\commerce\base\RequestResponseInterface;
 use craft\helpers\Json;
+use PayPalHttp\HttpResponse;
 
 /**
  * PayPal Checkout CheckoutResponse
@@ -20,12 +21,12 @@ class CheckoutResponse implements RequestResponseInterface
     public CONST STATUS_SUCCESSFUL = 'successful';
 
     /**
-     * @var
+     * @var string
      */
     protected $status;
 
     /**
-     * @var
+     * @var mixed
      */
     protected $data;
 
@@ -42,12 +43,12 @@ class CheckoutResponse implements RequestResponseInterface
     /**
      * Construct the response
      *
-     * @param $data
+     * @param HttpResponse $data
      */
     public function __construct($data) {
         $this->data = $data;
 
-        if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
+        if ($this->data && isset($this->data->result->status, $this->data->result->message) && $this->data->result->status == self::STATUS_ERROR) {
             $this->setMessage($this->data->result->message);
         }
     }
@@ -59,13 +60,24 @@ class CheckoutResponse implements RequestResponseInterface
     {
         $this->status = self::STATUS_REDIRECT;
 
-        if ($this->data && isset($this->data->result->status) && $this->data->result->status == 'COMPLETED') {
+        if ($this->data && isset($this->data->result, $this->data->result->status) && $this->data->result->status == 'COMPLETED') {
             $this->status = self::STATUS_SUCCESSFUL;
 
-            $captureStatus = $this->data->result->purchase_units->payments->captures[0]->status ?? null;
-            $authorizeStatus = $this->data->result->purchase_units->payments->authorizations[0]->status ?? null;
-            if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
-                $this->status = self::STATUS_PROCESSING;
+            if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units->payments)) {
+                $captureStatus = null;
+                $authorizeStatus = null;
+
+                if (!empty($this->data->result->purchase_units->payments->captures)) {
+                    $captureStatus = $this->data->result->purchase_units->payments->captures[0]->status;
+                }
+
+                if (!empty($this->data->result->purchase_units->payments->authorizations)) {
+                    $authorizeStatus = $this->data->result->purchase_units->payments->authorizations[0]->status;
+                }
+
+                if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
+                    $this->status = self::STATUS_PROCESSING;
+                }
             }
         } else if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
             $this->status = self::STATUS_ERROR;
