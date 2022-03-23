@@ -23,7 +23,8 @@ class RefundResponse implements RequestResponseInterface
      *
      * @param HttpResponse $data
      */
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->data = $data;
     }
 
@@ -134,6 +135,6 @@ class RefundResponse implements RequestResponseInterface
      */
     public function redirect()
     {
-
+        return null;
     }
 }

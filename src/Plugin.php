@@ -12,7 +12,6 @@ use craft\commerce\services\Gateways;
 use craft\events\RegisterComponentTypesEvent;
 use yii\base\Event;
 
-
 /**
  * Plugin represents the PayPal Checkout integration plugin.
  *

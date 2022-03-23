@@ -30,10 +30,11 @@ use craft\helpers\UrlHelper;
 use craft\web\Response as WebResponse;
 use craft\web\View;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
-use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
 use PayPalCheckoutSdk\Orders\OrdersAuthorizeRequest;
 use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 use PayPalCheckoutSdk\Payments\AuthorizationsCaptureRequest;
 use PayPalCheckoutSdk\Payments\CapturesRefundRequest;
 use PayPalHttp\HttpException;
@@ -45,7 +46,6 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
-use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
 
 /**
  * This class represents the PayPal Checkout gateway
@@ -62,7 +62,7 @@ class Gateway extends BaseGateway
 {
     const PAYMENT_TYPES = [
         'authorize' => 'AUTHORIZE',
-        'purchase' => 'CAPTURE'
+        'purchase' => 'CAPTURE',
     ];
 
     /**
@@ -515,7 +515,7 @@ class Gateway extends BaseGateway
         $body = [
             'amount' => [
                 'value' => (string)$amountValue,
-                'currency_code' => $transaction->paymentCurrency
+                'currency_code' => $transaction->paymentCurrency,
             ],
         ];
 
@@ -680,7 +680,7 @@ class Gateway extends BaseGateway
             'shipping_preference' => $shippingPreference,
             'user_action' => 'PAY_NOW',
             'return_url' => UrlHelper::siteUrl($order->returnUrl),
-            'cancel_url' => UrlHelper::siteUrl($order->cancelUrl)
+            'cancel_url' => UrlHelper::siteUrl($order->cancelUrl),
         ];
 
         return $requestData;
@@ -713,7 +713,7 @@ class Gateway extends BaseGateway
         }
 
         return [
-            $purchaseUnits
+            $purchaseUnits,
         ];
     }
 

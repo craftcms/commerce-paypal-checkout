@@ -3,7 +3,6 @@
 namespace craft\commerce\paypalcheckout\responses;
 
 use craft\commerce\base\RequestResponseInterface;
-use craft\helpers\Json;
 use PayPalHttp\HttpResponse;
 
 /**
@@ -15,10 +14,10 @@ use PayPalHttp\HttpResponse;
  */
 class CheckoutResponse implements RequestResponseInterface
 {
-    public CONST STATUS_ERROR = 'error';
-    public CONST STATUS_REDIRECT = 'redirect';
-    public CONST STATUS_PROCESSING = 'processing';
-    public CONST STATUS_SUCCESSFUL = 'successful';
+    public const STATUS_ERROR = 'error';
+    public const STATUS_REDIRECT = 'redirect';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_SUCCESSFUL = 'successful';
 
     /**
      * @var string
@@ -40,7 +39,8 @@ class CheckoutResponse implements RequestResponseInterface
      *
      * @param HttpResponse $data
      */
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->data = $data;
 
         if (isset($this->data->result->status, $this->data->result->message) && $this->data->result->status == self::STATUS_ERROR) {
@@ -74,7 +74,7 @@ class CheckoutResponse implements RequestResponseInterface
                     $this->status = self::STATUS_PROCESSING;
                 }
             }
-        } else if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
+        } elseif ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
             $this->status = self::STATUS_ERROR;
         }
 
@@ -139,7 +139,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getRedirectUrl(): string
     {
-        return ''.$this->data->result->id;
+        return (string)$this->data->result->id;
     }
 
     /**
