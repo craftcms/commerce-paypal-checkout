@@ -130,7 +130,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getRedirectMethod(): string
     {
-        return $this->getStatus() == self::STATUS_REDIRECT;
+        return 'GET';
     }
 
     /**
