@@ -31,11 +31,6 @@ class CheckoutResponse implements RequestResponseInterface
     protected $data;
 
     /**
-     * @var bool
-     */
-    private $_processing = false;
-
-    /**
      * @var string
      */
     private $_message = '';
@@ -48,7 +43,7 @@ class CheckoutResponse implements RequestResponseInterface
     public function __construct($data) {
         $this->data = $data;
 
-        if ($this->data && isset($this->data->result->status, $this->data->result->message) && $this->data->result->status == self::STATUS_ERROR) {
+        if (isset($this->data->result->status, $this->data->result->message) && $this->data->result->status == self::STATUS_ERROR) {
             $this->setMessage($this->data->result->message);
         }
     }
@@ -85,13 +80,7 @@ class CheckoutResponse implements RequestResponseInterface
 
         return $this->status;
     }
-    /**
-     * @param bool $status
-     */
-    public function setProcessing(bool $status)
-    {
-        $this->_processing = $status;
-    }
+
     /**
      * Returns whether the payment was successful.
      *

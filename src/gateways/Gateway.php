@@ -797,18 +797,24 @@ class Gateway extends BaseGateway
      */
     private function _buildShipping(Order $order): array
     {
-        /** @var ShippingMethod $shippingMethod */
+        /** @var ShippingMethod|null $shippingMethod */
         $shippingMethod = $order->getShippingMethod();
-        /** @var Address $shippingAddress */
-        $shippingAddress = $order->shippingAddress;
+        /** @var Address|null $shippingAddress */
+        $shippingAddress = $order->getShippingAddress();
 
         $return = [];
 
-        if ($shippingAddress && $shippingAddress->country) {
+        if ($shippingAddress && $shippingAddress->getCountry()) {
             $return['address'] = $this->_buildAddressArray($shippingAddress);
 
-            $name = $shippingAddress->fullName ?: $shippingAddress->firstName . ' ' . $shippingAddress->lastName;
-            if ($name) {
+            /** @var string|null $fullName */
+            $fullName = $shippingAddress->fullName;
+            /** @var string|null $firstName */
+            $firstName = $shippingAddress->firstName;
+            /** @var string|null $lastName */
+            $lastName = $shippingAddress->lastName;
+            $name = $fullName ?: $firstName . ' ' . $lastName;
+            if (trim($name)) {
                 $return['name'] = ['full_name' => StringHelper::truncate($name, 300, '')];
             }
         }
@@ -830,7 +836,7 @@ class Gateway extends BaseGateway
      */
     private function _buildPayer(Order $order): ?array
     {
-        /** @var Address $billingAddress */
+        /** @var Address|null $billingAddress */
         $billingAddress = $order->billingAddress;
 
         if (!$billingAddress && !$order->email) {
@@ -859,7 +865,7 @@ class Gateway extends BaseGateway
         }
 
         // To meet PayPal's requirements, the country must exist on the address
-        if ($billingAddress->country) {
+        if ($billingAddress->getCountry()) {
             $return['address'] = $this->_buildAddressArray($billingAddress);
         }
 
