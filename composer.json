@@ -25,8 +25,8 @@
     "rss": "https://github.com/craftcms/commerce-paypal-checkout/commits/master.atom"
   },
   "require": {
-    "craftcms/cms": "^4.0",
-    "craftcms/commerce": "^4.0",
+    "craftcms/cms": "^4.0.0-beta.3",
+    "craftcms/commerce": "^4.0.0-beta.1",
     "paypal/paypal-checkout-sdk": "^1.0"
   },
   "autoload": {
