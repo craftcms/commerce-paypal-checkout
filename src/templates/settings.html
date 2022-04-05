@@ -42,13 +42,14 @@
   errors: gateway.getErrors('landingPage')
 }) }}
 
-{{ textField({
+{{ autosuggestField({
   label: 'Brand Name'|t('commerce'),
   id: 'brandName',
   class: 'ltr',
   name: 'brandName',
-  value: gateway.brandName,
-  errors: gateway.getErrors('brandName')
+  suggestEnvVars: true,
+  value: gateway.getBrandName(false),
+  errors: gateway.getErrors('brandName'),
 }) }}
 
 {{ booleanMenuField({

@@ -23,6 +23,7 @@ use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
 use craft\elements\Address;
+use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
@@ -51,6 +52,7 @@ use yii\base\NotSupportedException;
 /**
  * This class represents the PayPal Checkout gateway
  *
+ * @property string|null $brandName
  * @property string|null $clientId PayPal account client ID
  * @property string|null $secret PayPal account secret API key
  * @property string|null $landingPage The gateway’s landing page
@@ -71,26 +73,28 @@ class Gateway extends BaseGateway
     /**
      * @since 1.1.0
      */
-    const SDK_URL = 'https://www.paypal.com/sdk/js';
+    public const SDK_URL = 'https://www.paypal.com/sdk/js';
 
     /**
      * @var string|null PayPal account client ID.
      * @see getClientId()
      * @see setClientId()
      */
-    private $_clientId;
+    private ?string $_clientId;
 
     /**
      * @var string|null PayPal account secret API key.
      * @see getSecret()
      * @see setSecret()
      */
-    private $_secret;
+    private ?string $_secret;
 
     /**
-     * @var string The label that overrides the business name on off-site PayPal pages.
+     * @var string|null The label that overrides the business name on off-site PayPal pages.
+     * @see getBrandName()
+     * @see setBrandName()
      */
-    public $brandName;
+    public ?string $_brandName;
 
     /**
      * @var string|null The type of landing page to display on the PayPal site for user checkout.
@@ -100,21 +104,21 @@ class Gateway extends BaseGateway
      * @see getLandingPage()
      * @see setLandingPage()
      */
-    private $_landingPage;
+    private ?string $_landingPage;
 
     /**
      * @var bool|string Whether cart information should be sent to the payment gateway
      * @see getSendCartInfo()
      * @see setSendCartInfo()
      */
-    private $_sendCartInfo = false;
+    private string|bool $_sendCartInfo = false;
 
     /**
      * @var bool|string Whether Test Mode should be used
      * @see getTestMode()
      * @see setTestMode()
      */
-    private $_testMode = false;
+    private string|bool $_testMode = false;
 
     /**
      * @inheritdoc
@@ -122,6 +126,7 @@ class Gateway extends BaseGateway
     public function getSettings(): array
     {
         $settings = parent::getSettings();
+        $settings['brandName'] = $this->getBrandName(false);
         $settings['clientId'] = $this->getClientId(false);
         $settings['secret'] = $this->getSecret(false);
         $settings['landingPage'] = $this->getLandingPage(false);
@@ -139,7 +144,7 @@ class Gateway extends BaseGateway
      */
     public function getClientId(bool $parse = true): ?string
     {
-        return $parse ? Craft::parseEnv($this->_clientId) : $this->_clientId;
+        return $parse ? App::parseEnv($this->_clientId) : $this->_clientId;
     }
 
     /**
@@ -154,6 +159,29 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * Returns the gateway’s brand name.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return string|null
+     * @since 2.0.0
+     */
+    public function getBrandName(bool $parse = true): ?string
+    {
+        return $parse ? App::parseEnv($this->_brandName) : $this->_brandName;
+    }
+
+    /**
+     * Sets the gateway’s brand name.
+     *
+     * @param string|null $brandName
+     * @since 2.0.0
+     */
+    public function setBrandName(?string $brandName): void
+    {
+        $this->_brandName = $brandName;
+    }
+
+    /**
      * Returns the gateway’s secret API key.
      *
      * @param bool $parse Whether to parse the value as an environment variable
@@ -162,7 +190,7 @@ class Gateway extends BaseGateway
      */
     public function getSecret(bool $parse = true): ?string
     {
-        return $parse ? Craft::parseEnv($this->_secret) : $this->_secret;
+        return $parse ? App::parseEnv($this->_secret) : $this->_secret;
     }
 
     /**
@@ -185,7 +213,7 @@ class Gateway extends BaseGateway
      */
     public function getLandingPage(bool $parse = true): ?string
     {
-        return $parse ? Craft::parseEnv($this->_landingPage) : $this->_landingPage;
+        return $parse ? App::parseEnv($this->_landingPage) : $this->_landingPage;
     }
 
     /**
