@@ -55,7 +55,7 @@ class CheckoutResponse implements RequestResponseInterface
     {
         $this->status = self::STATUS_REDIRECT;
 
-        if ($this->data && isset($this->data->result, $this->data->result->status) && $this->data->result->status == 'COMPLETED') {
+        if ($this->data && ($this->data->result && is_object($this->data->result)) && (isset($this->data->result->status) && $this->data->result->status == 'COMPLETED')) {
             $this->status = self::STATUS_SUCCESSFUL;
 
             if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units->payments)) {
@@ -139,6 +139,10 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getRedirectUrl(): string
     {
+        if (!is_object($this->data->result) || (is_object($this->data->result) && !isset($this->data->result->id))) {
+            return '';
+        }
+
         return (string)$this->data->result->id;
     }
 
@@ -149,6 +153,10 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getTransactionReference(): string
     {
+        if (!is_object($this->data->result) || (is_object($this->data->result) && !isset($this->data->result->id))) {
+            return '';
+        }
+
         return $this->data->result->id;
     }
 
@@ -159,7 +167,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getCode(): string
     {
-        return $this->data->statusCode;
+        return (string)$this->data->statusCode;
     }
 
     /**

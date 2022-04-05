@@ -14,7 +14,6 @@ use craft\commerce\base\ShippingMethod;
 use craft\commerce\elements\Order;
 use craft\commerce\errors\PaymentException;
 use craft\commerce\helpers\Currency;
-use craft\commerce\models\Address;
 use craft\commerce\models\payments\BasePaymentForm;
 use craft\commerce\models\payments\OffsitePaymentForm;
 use craft\commerce\models\PaymentSource;
@@ -23,6 +22,7 @@ use craft\commerce\paypalcheckout\PayPalCheckoutBundle;
 use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
+use craft\elements\Address;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
@@ -819,7 +819,7 @@ class Gateway extends BaseGateway
 
         $return = [];
 
-        if ($shippingAddress && $shippingAddress->getCountry()) {
+        if ($shippingAddress && $shippingAddress->getCountryCode()) {
             $return['address'] = $this->_buildAddressArray($shippingAddress);
 
             /** @var string|null $fullName */
@@ -880,7 +880,7 @@ class Gateway extends BaseGateway
         }
 
         // To meet PayPal's requirements, the country must exist on the address
-        if ($billingAddress->getCountry()) {
+        if ($billingAddress->getCountryCode()) {
             $return['address'] = $this->_buildAddressArray($billingAddress);
         }
 
@@ -892,23 +892,18 @@ class Gateway extends BaseGateway
      * https://developer.paypal.com/docs/api/orders/v2/#definition-address_portable
      *
      * @param Address $address
-     * @return array
+     * @return array{address_line_1: string, address_line_2: string, admin_area_2: string, admin_area_1: string, postal_code: string, country_code: string}
      * @since 1.1.1
      */
     private function _buildAddressArray(Address $address): array
     {
-        $stateText = $address->stateText;
-        if ($address->stateId && $state = $address->getState()) {
-            $stateText = $state->abbreviation;
-        }
-
         return [
-            'address_line_1' => StringHelper::truncate($address->address1, 300, ''),
-            'address_line_2' => StringHelper::truncate($address->address2, 300, ''),
-            'admin_area_2' => StringHelper::truncate($address->city, 120, ''),
-            'admin_area_1' => StringHelper::truncate($stateText, 300, ''),
-            'postal_code' => StringHelper::truncate($address->zipCode, 60, ''),
-            'country_code' => $address->country->iso,
+            'address_line_1' => StringHelper::truncate($address->addressLine1, 300, ''),
+            'address_line_2' => StringHelper::truncate($address->addressLine2, 300, ''),
+            'admin_area_2' => StringHelper::truncate($address->getLocality(), 120, ''),
+            'admin_area_1' => StringHelper::truncate($address->getAdministrativeArea(), 300, ''),
+            'postal_code' => StringHelper::truncate($address->getPostalCode(), 60, ''),
+            'country_code' => $address->getCountryCode(),
         ];
     }
 

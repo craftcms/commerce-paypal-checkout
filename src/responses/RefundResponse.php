@@ -112,7 +112,7 @@ class RefundResponse implements RequestResponseInterface
      *
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
@@ -129,11 +129,8 @@ class RefundResponse implements RequestResponseInterface
 
     /**
      * Perform the redirect.
-     *
-     * @return mixed
      */
-    public function redirect()
+    public function redirect(): void
     {
-        return null;
     }
 }
