@@ -14,7 +14,6 @@ use craft\commerce\base\ShippingMethod;
 use craft\commerce\elements\Order;
 use craft\commerce\errors\PaymentException;
 use craft\commerce\helpers\Currency;
-use craft\commerce\models\Address;
 use craft\commerce\models\payments\BasePaymentForm;
 use craft\commerce\models\payments\OffsitePaymentForm;
 use craft\commerce\models\PaymentSource;
@@ -23,6 +22,7 @@ use craft\commerce\paypalcheckout\PayPalCheckoutBundle;
 use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
 use craft\commerce\Plugin;
+use craft\elements\Address;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
@@ -46,6 +46,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 
 /**
  * This class represents the PayPal Checkout gateway
@@ -57,10 +58,12 @@ use yii\base\InvalidConfigException;
  * @property bool $testMode Whether Test Mode should be used
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0
+ *
+ * @property-read null|string $settingsHtml
  */
 class Gateway extends BaseGateway
 {
-    const PAYMENT_TYPES = [
+    public const PAYMENT_TYPES = [
         'authorize' => 'AUTHORIZE',
         'purchase' => 'CAPTURE',
     ];
@@ -253,7 +256,7 @@ class Gateway extends BaseGateway
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('commerce-paypal-checkout/settings', ['gateway' => $this]);
     }
@@ -269,7 +272,7 @@ class Gateway extends BaseGateway
      * @throws Exception
      * @throws InvalidConfigException
      */
-    public function getPaymentFormHtml(array $params)
+    public function getPaymentFormHtml(array $params): ?string
     {
         $defaults = [
             'gateway' => $this,
@@ -299,7 +302,7 @@ class Gateway extends BaseGateway
      * @param HttpResponse $data
      * @return RequestResponseInterface
      */
-    public function getResponseModel($data): RequestResponseInterface
+    public function getResponseModel(HttpResponse $data): RequestResponseInterface
     {
         return new CheckoutResponse($data);
     }
@@ -335,6 +338,7 @@ class Gateway extends BaseGateway
      * @param Transaction $transaction The capture transaction
      * @param string $reference Reference for the transaction being captured.
      * @return RequestResponseInterface
+     * @throws InvalidConfigException
      * @throws PaymentException
      */
     public function capture(Transaction $transaction, string $reference): RequestResponseInterface
@@ -426,9 +430,14 @@ class Gateway extends BaseGateway
      * @param BasePaymentForm $sourceData
      * @param int $userId
      * @return PaymentSource
+     * @throws NotSupportedException
      */
     public function createPaymentSource(BasePaymentForm $sourceData, int $userId): PaymentSource
     {
+        if (!$this->supportsPaymentSources()) {
+            throw new NotSupportedException(Craft::t('commerce', 'Payment sources are not supported by this gateway'));
+        }
+
         return new PaymentSource();
     }
 
@@ -437,9 +446,14 @@ class Gateway extends BaseGateway
      *
      * @param string $token
      * @return bool
+     * @throws NotSupportedException
      */
     public function deletePaymentSource($token): bool
     {
+        if (!$this->supportsPaymentSources()) {
+            throw new NotSupportedException(Craft::t('commerce', 'Payment sources are not supported by this gateway'));
+        }
+
         return false;
     }
 
@@ -500,6 +514,7 @@ class Gateway extends BaseGateway
      *
      * @param Transaction $transaction The refund transaction
      * @return RequestResponseInterface
+     * @throws InvalidConfigException
      * @throws \Exception
      */
     public function refund(Transaction $transaction): RequestResponseInterface
@@ -523,9 +538,9 @@ class Gateway extends BaseGateway
         // the parent was
         $response = json_decode($parentTransaction->response, true);
         if ($parentTransaction->type == 'capture') {
-            $captureId = ArrayHelper::getValue($response, 'result.id', null);
+            $captureId = ArrayHelper::getValue($response, 'result.id');
         } else {
-            $captureId = ArrayHelper::getValue($response, 'result.purchase_units.0.payments.captures.0.id', null);
+            $captureId = ArrayHelper::getValue($response, 'result.purchase_units.0.payments.captures.0.id');
         }
 
         $request = new CapturesRefundRequest($captureId);
@@ -549,10 +564,9 @@ class Gateway extends BaseGateway
      */
     public function processWebHook(): WebResponse
     {
-        // Create response even though it, currently, is not used
-        $response = new WebResponse();
-        $response->setStatusCode(200);
-        $response->content = 'OK';
+        $response = Craft::$app->getResponse();
+        $response->data = 'ok';
+
         return $response;
     }
 
@@ -693,6 +707,7 @@ class Gateway extends BaseGateway
      * @param Order $order
      * @param Transaction $transaction
      * @return array
+     * @throws \craft\errors\SiteNotFoundException
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
@@ -750,7 +765,7 @@ class Gateway extends BaseGateway
 
             // $discount = $order->getAdjustmentsTotalByType('discount') * -1;
             $discount = $order->getTotalDiscount();
-            if ($discount !== 0) {
+            if ($discount != 0) {
                 $return['breakdown']['discount'] = [
                     'currency_code' => $order->paymentCurrency,
                     'value' => (string)Currency::round($discount * -1), // Needs to be a positive number
@@ -804,7 +819,7 @@ class Gateway extends BaseGateway
 
         $return = [];
 
-        if ($shippingAddress && $shippingAddress->getCountry()) {
+        if ($shippingAddress && $shippingAddress->getCountryCode()) {
             $return['address'] = $this->_buildAddressArray($shippingAddress);
 
             /** @var string|null $fullName */
@@ -865,7 +880,7 @@ class Gateway extends BaseGateway
         }
 
         // To meet PayPal's requirements, the country must exist on the address
-        if ($billingAddress->getCountry()) {
+        if ($billingAddress->getCountryCode()) {
             $return['address'] = $this->_buildAddressArray($billingAddress);
         }
 
@@ -877,23 +892,18 @@ class Gateway extends BaseGateway
      * https://developer.paypal.com/docs/api/orders/v2/#definition-address_portable
      *
      * @param Address $address
-     * @return array
+     * @return array{address_line_1: string, address_line_2: string, admin_area_2: string, admin_area_1: string, postal_code: string, country_code: string}
      * @since 1.1.1
      */
     private function _buildAddressArray(Address $address): array
     {
-        $stateText = $address->stateText;
-        if ($address->stateId && $state = $address->getState()) {
-            $stateText = $state->abbreviation;
-        }
-
         return [
-            'address_line_1' => StringHelper::truncate($address->address1, 300, ''),
-            'address_line_2' => StringHelper::truncate($address->address2, 300, ''),
-            'admin_area_2' => StringHelper::truncate($address->city, 120, ''),
-            'admin_area_1' => StringHelper::truncate($stateText, 300, ''),
-            'postal_code' => StringHelper::truncate($address->zipCode, 60, ''),
-            'country_code' => $address->country->iso,
+            'address_line_1' => StringHelper::truncate($address->addressLine1, 300, ''),
+            'address_line_2' => StringHelper::truncate($address->addressLine2, 300, ''),
+            'admin_area_2' => StringHelper::truncate($address->getLocality(), 120, ''),
+            'admin_area_1' => StringHelper::truncate($address->getAdministrativeArea(), 300, ''),
+            'postal_code' => StringHelper::truncate($address->getPostalCode(), 60, ''),
+            'country_code' => $address->getCountryCode(),
         ];
     }
 
