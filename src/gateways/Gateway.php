@@ -80,21 +80,21 @@ class Gateway extends BaseGateway
      * @see getClientId()
      * @see setClientId()
      */
-    private ?string $_clientId;
+    private ?string $_clientId = null;
 
     /**
      * @var string|null PayPal account secret API key.
      * @see getSecret()
      * @see setSecret()
      */
-    private ?string $_secret;
+    private ?string $_secret = null;
 
     /**
      * @var string|null The label that overrides the business name on off-site PayPal pages.
      * @see getBrandName()
      * @see setBrandName()
      */
-    public ?string $_brandName;
+    public ?string $_brandName = null;
 
     /**
      * @var string|null The type of landing page to display on the PayPal site for user checkout.
@@ -104,7 +104,7 @@ class Gateway extends BaseGateway
      * @see getLandingPage()
      * @see setLandingPage()
      */
-    private ?string $_landingPage;
+    private ?string $_landingPage = null;
 
     /**
      * @var bool|string Whether cart information should be sent to the payment gateway
@@ -236,7 +236,7 @@ class Gateway extends BaseGateway
      */
     public function getTestMode(bool $parse = true)
     {
-        return $parse ? Craft::parseBooleanEnv($this->_testMode) : $this->_testMode;
+        return $parse ? App::parseBooleanEnv($this->_testMode) : $this->_testMode;
     }
 
     /**
@@ -257,9 +257,9 @@ class Gateway extends BaseGateway
      * @return bool|string
      * @since 1.3.1
      */
-    public function getSendCartInfo(bool $parse = true)
+    public function getSendCartInfo(bool $parse = true): bool|string
     {
-        return $parse ? Craft::parseBooleanEnv($this->_sendCartInfo) : $this->_sendCartInfo;
+        return $parse ? App::parseBooleanEnv($this->_sendCartInfo) : $this->_sendCartInfo;
     }
 
     /**
@@ -268,7 +268,7 @@ class Gateway extends BaseGateway
      * @param bool|string $sendCartInfo
      * @since 1.3.1
      */
-    public function setSendCartInfo($sendCartInfo): void
+    public function setSendCartInfo(bool|string $sendCartInfo): void
     {
         $this->_sendCartInfo = $sendCartInfo;
     }
