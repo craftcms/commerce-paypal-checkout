@@ -4,6 +4,7 @@
 namespace craft\commerce\paypalcheckout\responses;
 
 use craft\commerce\base\RequestResponseInterface;
+use PayPalHttp\HttpResponse;
 
 /**
  * PayPal Checkout RefundResponse
@@ -19,9 +20,10 @@ class RefundResponse implements RequestResponseInterface
     /**
      * Construct the response
      *
-     * @param $data
+     * @param HttpResponse $data
      */
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->data = $data;
     }
 
@@ -122,7 +124,7 @@ class RefundResponse implements RequestResponseInterface
      */
     public function getMessage(): string
     {
-        return $this->data && !empty($this->data->message) ? $this->data->message : '';
+        return $this->data && isset($this->data->result['message']) ? $this->data->result['message'] : '';
     }
 
     /**
@@ -132,6 +134,6 @@ class RefundResponse implements RequestResponseInterface
      */
     public function redirect()
     {
-
+        return null;
     }
 }

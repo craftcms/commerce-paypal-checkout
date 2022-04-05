@@ -1,5 +1,39 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## 1.3.2.1 - 2022-02-24
+
+### Fixed
+- Fixed an error that could occur when trying to refund an order. ([#49](https://github.com/craftcms/commerce-paypal-checkout/issues/49))
+
+## 1.3.2 - 2022-02-24
+
+### Fixed
+- Fixed an error that could occur when no billing address was provided. ([#48](https://github.com/craftcms/commerce-paypal-checkout/issues/48))
+- Fixed a bug where errors weren’t being returned from the API. ([#51](https://github.com/craftcms/commerce-paypal-checkout/issues/51))
+
+## 1.3.1 - 2021-12-07
+
+### Added
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getClientId()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setClientId()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getSecret()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setSecret()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getSendCartInfo()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setSendCartInfo()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getTestMode()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setTestMode()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getLandingLage()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setLandingLage()`.
+
+### Fixed
+- Fixed a bug where “Send Gateway Info”, “Test mode?” and “Landing Page” gateway settings were not being parsed as environment variables.
+
+## 1.3.0 - 2021-12-01
+
+### Changed
+- The plugin now requires Craft 3.7.22 or later.
+- The “Test mode?” and “Landing Page” gateway settings now support environment variables.
+
 ## 1.2.2.2 - 2021-07-15
 
 ### Fixed

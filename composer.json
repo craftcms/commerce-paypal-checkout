@@ -38,5 +38,22 @@
     "name": "PayPal Checkout for Craft Commerce",
     "handle": "commerce-paypal-checkout",
     "documentationUrl": "https://github.com/craftcms/commerce-paypal-checkout/blob/master/README.md"
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  },
+  "require-dev": {
+    "craftcms/phpstan": "dev-main",
+    "craftcms/ecs": "dev-main"
+  },
+  "scripts": {
+    "phpstan": "phpstan --memory-limit=1G",
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix"
   }
 }
