@@ -1,7 +1,6 @@
 {
   "name": "craftcms/commerce-paypal-checkout",
   "description": "PayPal Checkout integration for Craft Commerce 4.0+",
-  "version": "2.0",
   "type": "craft-plugin",
   "keywords": [
     "paypal",
@@ -25,8 +24,8 @@
     "rss": "https://github.com/craftcms/commerce-paypal-checkout/commits/master.atom"
   },
   "require": {
-    "craftcms/cms": "^4.0.0-beta.3",
-    "craftcms/commerce": "^4.0.0-beta.1",
+    "craftcms/cms": "^4.0.0-beta.4",
+    "craftcms/commerce": "^4.0.0-beta.2",
     "paypal/paypal-checkout-sdk": "^1.0"
   },
   "autoload": {
