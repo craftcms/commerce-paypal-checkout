@@ -9,6 +9,7 @@ function initPaypalCheckout() {
     setTimeout(initPaypalCheckout, 200);
   } else {
     var $wrapper = document.querySelector('.paypal-rest-form');
+    var $renderDiv = $wrapper.firstElementChild;
     var $form = findClosestParent($wrapper, function(element) {
       return element.tagName === 'FORM';
     });
@@ -16,11 +17,11 @@ function initPaypalCheckout() {
     var completeUrl = $wrapper.dataset.complete;
     var transactionHash;
     var errorShown = false;
-    
+
     paypal_checkout_sdk.Buttons({
       createOrder: function(data, actions) {
         var form = new FormData($form);
-        
+
         return fetch(paymentUrl, {
           method: 'post',
           body: form,
@@ -32,7 +33,7 @@ function initPaypalCheckout() {
         }).then(function(data) {
           if (data.error) {
             var errorMessage = '';
-            
+
             try {
               // Handle PayPal errors
               var error = JSON.parse(data.error);
@@ -43,7 +44,7 @@ function initPaypalCheckout() {
               // Handle Commerce errors
               errorMessage = data.error;
             }
-            
+
             throw Error(errorMessage);
           }
           transactionHash = data.transactionHash;
@@ -64,10 +65,10 @@ function initPaypalCheckout() {
         if (completeUrl.indexOf('?') >= 0) {
           separator = '&';
         }
-        
+
         window.location = completeUrl + separator + 'commerceTransactionHash=' + transactionHash;
       }
-    }).render('#paypal-button-container');
+    }).render('#' + $renderDiv.id);
   }
 }
 
