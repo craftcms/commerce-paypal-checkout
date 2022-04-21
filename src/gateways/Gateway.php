@@ -456,7 +456,7 @@ class Gateway extends BaseGateway
      * Creates a payment source from source data and user id.
      *
      * @param BasePaymentForm $sourceData
-     * @param int $userId
+     * @param int $customerId
      * @return PaymentSource
      * @throws NotSupportedException
      */
