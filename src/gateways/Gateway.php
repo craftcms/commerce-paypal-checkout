@@ -460,7 +460,7 @@ class Gateway extends BaseGateway
      * @return PaymentSource
      * @throws NotSupportedException
      */
-    public function createPaymentSource(BasePaymentForm $sourceData, int $userId): PaymentSource
+    public function createPaymentSource(BasePaymentForm $sourceData, int $customerId): PaymentSource
     {
         if (!$this->supportsPaymentSources()) {
             throw new NotSupportedException(Craft::t('commerce', 'Payment sources are not supported by this gateway'));
