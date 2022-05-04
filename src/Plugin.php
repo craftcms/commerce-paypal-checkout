@@ -12,7 +12,6 @@ use craft\commerce\services\Gateways;
 use craft\events\RegisterComponentTypesEvent;
 use yii\base\Event;
 
-
 /**
  * Plugin represents the PayPal Checkout integration plugin.
  *
@@ -24,12 +23,12 @@ class Plugin extends \craft\base\Plugin
     /**
      * @inheritDoc
      */
-    public $schemaVersion = '1.0';
+    public string $schemaVersion = '1.0';
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 

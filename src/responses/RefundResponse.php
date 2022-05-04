@@ -3,8 +3,8 @@
 
 namespace craft\commerce\paypalcheckout\responses;
 
-use Craft;
 use craft\commerce\base\RequestResponseInterface;
+use PayPalHttp\HttpResponse;
 
 /**
  * PayPal Checkout RefundResponse
@@ -20,14 +20,15 @@ class RefundResponse implements RequestResponseInterface
     /**
      * Construct the response
      *
-     * @param $data
+     * @param HttpResponse $data
      */
-    public function __construct($data) {
+    public function __construct($data)
+    {
         $this->data = $data;
     }
 
     /**
-     * Returns whether or not the payment was successful.
+     * Returns whether the payment was successful.
      *
      * @return bool
      */
@@ -37,7 +38,7 @@ class RefundResponse implements RequestResponseInterface
     }
 
     /**
-     * Returns whether or not the payment is being processed by gateway.
+     * Returns whether the payment is being processed by gateway.
      *
      * @return bool
      */
@@ -47,7 +48,7 @@ class RefundResponse implements RequestResponseInterface
     }
 
     /**
-     * Returns whether or not the user needs to be redirected.
+     * Returns whether the user needs to be redirected.
      *
      * @return bool
      */
@@ -111,7 +112,7 @@ class RefundResponse implements RequestResponseInterface
      *
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
@@ -123,16 +124,13 @@ class RefundResponse implements RequestResponseInterface
      */
     public function getMessage(): string
     {
-        return $this->data && !empty($this->data->message) ? $this->data->message : '';
+        return $this->data && isset($this->data->result['message']) ? $this->data->result['message'] : '';
     }
 
     /**
      * Perform the redirect.
-     *
-     * @return mixed
      */
-    public function redirect()
+    public function redirect(): void
     {
-
     }
 }

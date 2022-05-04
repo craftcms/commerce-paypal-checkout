@@ -3,7 +3,7 @@
 namespace craft\commerce\paypalcheckout\responses;
 
 use craft\commerce\base\RequestResponseInterface;
-use craft\helpers\Json;
+use PayPalHttp\HttpResponse;
 
 /**
  * PayPal Checkout CheckoutResponse
@@ -14,40 +14,36 @@ use craft\helpers\Json;
  */
 class CheckoutResponse implements RequestResponseInterface
 {
-    public CONST STATUS_ERROR = 'error';
-    public CONST STATUS_REDIRECT = 'redirect';
-    public CONST STATUS_PROCESSING = 'processing';
-    public CONST STATUS_SUCCESSFUL = 'successful';
+    public const STATUS_ERROR = 'error';
+    public const STATUS_REDIRECT = 'redirect';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_SUCCESSFUL = 'successful';
 
     /**
-     * @var
+     * @var string|null
      */
-    protected $status;
+    protected ?string $status = null;
 
     /**
-     * @var
+     * @var HttpResponse|null
      */
-    protected $data;
-
-    /**
-     * @var bool
-     */
-    private $_processing = false;
+    protected ?HttpResponse $data = null;
 
     /**
      * @var string
      */
-    private $_message = '';
+    private string $_message = '';
 
     /**
      * Construct the response
      *
-     * @param $data
+     * @param HttpResponse|null $data
      */
-    public function __construct($data) {
+    public function __construct(?HttpResponse $data)
+    {
         $this->data = $data;
 
-        if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
+        if (isset($this->data->result->status, $this->data->result->message) && $this->data->result->status == self::STATUS_ERROR) {
             $this->setMessage($this->data->result->message);
         }
     }
@@ -59,27 +55,32 @@ class CheckoutResponse implements RequestResponseInterface
     {
         $this->status = self::STATUS_REDIRECT;
 
-        if ($this->data && isset($this->data->result->status) && $this->data->result->status == 'COMPLETED') {
+        if ($this->data && ($this->data->result && is_object($this->data->result)) && (isset($this->data->result->status) && $this->data->result->status == 'COMPLETED')) {
             $this->status = self::STATUS_SUCCESSFUL;
 
-            $captureStatus = $this->data->result->purchase_units->payments->captures[0]->status ?? null;
-            $authorizeStatus = $this->data->result->purchase_units->payments->authorizations[0]->status ?? null;
-            if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
-                $this->status = self::STATUS_PROCESSING;
+            if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units->payments)) {
+                $captureStatus = null;
+                $authorizeStatus = null;
+
+                if (!empty($this->data->result->purchase_units->payments->captures)) {
+                    $captureStatus = $this->data->result->purchase_units->payments->captures[0]->status;
+                }
+
+                if (!empty($this->data->result->purchase_units->payments->authorizations)) {
+                    $authorizeStatus = $this->data->result->purchase_units->payments->authorizations[0]->status;
+                }
+
+                if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
+                    $this->status = self::STATUS_PROCESSING;
+                }
             }
-        } else if ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
+        } elseif ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
             $this->status = self::STATUS_ERROR;
         }
 
         return $this->status;
     }
-    /**
-     * @param bool $status
-     */
-    public function setProcessing(bool $status)
-    {
-        $this->_processing = $status;
-    }
+
     /**
      * Returns whether the payment was successful.
      *
@@ -118,7 +119,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getRedirectMethod(): string
     {
-        return $this->getStatus() == self::STATUS_REDIRECT;
+        return 'GET';
     }
 
     /**
@@ -138,7 +139,11 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getRedirectUrl(): string
     {
-        return ''.$this->data->result->id;
+        if (!is_object($this->data->result) || (is_object($this->data->result) && !isset($this->data->result->id))) {
+            return '';
+        }
+
+        return (string)$this->data->result->id;
     }
 
     /**
@@ -148,6 +153,10 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getTransactionReference(): string
     {
+        if (!is_object($this->data->result) || (is_object($this->data->result) && !isset($this->data->result->id))) {
+            return '';
+        }
+
         return $this->data->result->id;
     }
 
@@ -158,7 +167,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getCode(): string
     {
-        return $this->data->statusCode;
+        return (string)$this->data->statusCode;
     }
 
     /**
@@ -166,7 +175,7 @@ class CheckoutResponse implements RequestResponseInterface
      *
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
@@ -192,11 +201,9 @@ class CheckoutResponse implements RequestResponseInterface
 
     /**
      * Perform the redirect.
-     *
-     * @return mixed
      */
-    public function redirect()
+    public function redirect(): void
     {
-        // TODO: Implement redirect() method.
+        return;
     }
 }
