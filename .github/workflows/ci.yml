@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - develop
-      - '2.0'
   pull_request:
     branches:
       - develop
-      - '2.0'
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
