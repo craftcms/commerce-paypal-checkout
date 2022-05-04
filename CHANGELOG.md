@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 2.0.0-RC1 - 2022-05-04
 
 ### Added
 - Added Craft CMS 4 and Craft Commerce 4 compatibility.

@@ -24,8 +24,9 @@
     "rss": "https://github.com/craftcms/commerce-paypal-checkout/commits/master.atom"
   },
   "require": {
-    "craftcms/cms": "^4.0.0-beta.4",
-    "craftcms/commerce": "^4.0.0-beta.2",
+    "php": "^8.0.2",
+    "craftcms/cms": "^4.0.0-RC3",
+    "craftcms/commerce": "^4.0.0-RC1",
     "paypal/paypal-checkout-sdk": "^1.0"
   },
   "autoload": {
@@ -44,6 +45,9 @@
     "allow-plugins": {
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true
+    },
+    "platform": {
+      "php": "8.0.2"
     }
   },
   "require-dev": {
