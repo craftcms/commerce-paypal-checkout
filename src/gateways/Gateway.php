@@ -234,7 +234,7 @@ class Gateway extends BaseGateway
      * @return bool|string
      * @since 1.3.1
      */
-    public function getTestMode(bool $parse = true)
+    public function getTestMode(bool $parse = true): bool|string
     {
         return $parse ? App::parseBooleanEnv($this->_testMode) : $this->_testMode;
     }
@@ -242,10 +242,10 @@ class Gateway extends BaseGateway
     /**
      * Sets whether Test Mode should be used.
      *
-     * @param string|bool $testMode
+     * @param bool|string $testMode
      * @since 1.3.1
      */
-    public function setTestMode($testMode): void
+    public function setTestMode(bool|string $testMode): void
     {
         $this->_testMode = $testMode;
     }
@@ -336,10 +336,10 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * @param HttpResponse|array $data
+     * @param array|HttpResponse $data
      * @return RefundResponse
      */
-    public function getRefundResponseModel($data): RefundResponse
+    public function getRefundResponseModel(array|HttpResponse $data): RefundResponse
     {
         return new RefundResponse($data);
     }
@@ -425,7 +425,6 @@ class Gateway extends BaseGateway
      *
      * @param Transaction $transaction The transaction
      * @return RequestResponseInterface
-     * @throws PaymentException
      */
     public function completePurchase(Transaction $transaction): RequestResponseInterface
     {
@@ -476,7 +475,7 @@ class Gateway extends BaseGateway
      * @return bool
      * @throws NotSupportedException
      */
-    public function deletePaymentSource($token): bool
+    public function deletePaymentSource(string $token): bool
     {
         if (!$this->supportsPaymentSources()) {
             throw new NotSupportedException(Craft::t('commerce', 'Payment sources are not supported by this gateway'));
