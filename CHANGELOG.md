@@ -1,5 +1,12 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## 2.1.0 - 2022-07-13
+
+### Added
+- Added the `sendShippingInfo` setting to allow control over sending shipping information to PayPal. ([#27](https://github.com/craftcms/commerce-paypal-checkout/issues/27))
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::getSendShippingInfo()`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::setSendShippingInfo()`.
+
 ## 2.0.0 - 2022-05-04
 
 ### Added
