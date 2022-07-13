@@ -9,6 +9,15 @@
   value: gateway.getSendCartInfo(false)
 }) }}
 
+{{ booleanMenuField({
+  label: 'Send shipping information to PayPal when making transactions?'|t('commerce'),
+  id: 'sendShippingInfo',
+  name: 'sendShippingInfo',
+  includeEnvVars: true,
+  errors: gateway.getErrors('sendShippingInfo'),
+  value: gateway.getSendShippingInfo(false)
+}) }}
+
 {{ autosuggestField({
   label: 'Client ID'|t('commerce'),
   id: 'clientId',

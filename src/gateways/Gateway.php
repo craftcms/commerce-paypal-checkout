@@ -57,6 +57,7 @@ use yii\base\NotSupportedException;
  * @property string|null $secret PayPal account secret API key
  * @property string|null $landingPage The gateway’s landing page
  * @property bool $sendCartInfo Whether cart information should be sent to the payment gateway
+ * @property bool|string $sendShippingInfo
  * @property bool $testMode Whether Test Mode should be used
  * @author Pixel & Tonic, Inc. <support@pixelandtonic.com>
  * @since 1.0
@@ -114,6 +115,14 @@ class Gateway extends BaseGateway
     private string|bool $_sendCartInfo = false;
 
     /**
+     * @var bool|string Whether shipping information should be sent to the payment gateway
+     * @see getSendShippingInfo()
+     * @see setSendShippingInfo()
+     * @since 2.0.1
+     */
+    private string|bool $_sendShippingInfo = true;
+
+    /**
      * @var bool|string Whether Test Mode should be used
      * @see getTestMode()
      * @see setTestMode()
@@ -131,6 +140,7 @@ class Gateway extends BaseGateway
         $settings['secret'] = $this->getSecret(false);
         $settings['landingPage'] = $this->getLandingPage(false);
         $settings['sendCartInfo'] = $this->getSendCartInfo(false);
+        $settings['sendShippingInfo'] = $this->getSendShippingInfo(false);
         $settings['testMode'] = $this->getTestMode(false);
         return $settings;
     }
@@ -271,6 +281,29 @@ class Gateway extends BaseGateway
     public function setSendCartInfo(bool|string $sendCartInfo): void
     {
         $this->_sendCartInfo = $sendCartInfo;
+    }
+
+    /**
+     * Returns whether shipping information should be sent to the payment gateway.
+     *
+     * @param bool $parse Whether to parse the value as an environment variable
+     * @return bool|string
+     * @since 2.0.1
+     */
+    public function getSendShippingInfo(bool $parse = true): bool|string
+    {
+        return $parse ? App::parseBooleanEnv($this->_sendShippingInfo) : $this->_sendShippingInfo;
+    }
+
+    /**
+     * Sets whether shipping information should be sent to the payment gateway.
+     *
+     * @param bool|string $sendShippingInfo
+     * @since 2.0.1
+     */
+    public function setSendShippingInfo(bool|string $sendShippingInfo): void
+    {
+        $this->_sendShippingInfo = $sendShippingInfo;
     }
 
     /**
@@ -839,12 +872,15 @@ class Gateway extends BaseGateway
      */
     private function _buildShipping(Order $order): array
     {
+        $return = [];
+        if (!$this->getSendShippingInfo()) {
+            return $return;
+        }
+
         /** @var ShippingMethod|null $shippingMethod */
         $shippingMethod = $order->getShippingMethod();
         /** @var Address|null $shippingAddress */
         $shippingAddress = $order->getShippingAddress();
-
-        $return = [];
 
         if ($shippingAddress && $shippingAddress->getCountryCode()) {
             $return['address'] = $this->_buildAddressArray($shippingAddress);
