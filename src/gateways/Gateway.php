@@ -930,12 +930,12 @@ class Gateway extends BaseGateway
         }
 
         $name = [];
-        if ($billingAddress->fullName || $billingAddress->firstName) {
-            $name['given_name'] = StringHelper::truncate($billingAddress->fullName ?: $billingAddress->firstName, 140, '');
+        if ($billingAddress->firstName || $billingAddress->fullName) {
+            $name['given_name'] = StringHelper::truncate($billingAddress->firstName ?: $billingAddress->fullName, 140, '');
         }
 
-        if (!$billingAddress->fullName && $billingAddress->lastName) {
-            $name['surname'] = StringHelper::truncate($billingAddress->lastName, 140, '');
+        if ($billingAddress->lastName || $billingAddress->fullName) {
+            $name['surname'] = StringHelper::truncate($billingAddress->lastName ?: $billingAddress->fullName, 140, '');
         }
 
         if (!empty($name)) {

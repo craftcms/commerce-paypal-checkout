@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Fixed
+- Fixes a bug where names were being passed in correctly to the API.
+
 ## 2.1.0 - 2022-07-13
 
 ### Added
