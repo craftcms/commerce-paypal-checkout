@@ -445,12 +445,12 @@ class Gateway extends BaseGateway
         $client = $this->createClient();
 
         try {
-            $apiResponse = $client->execute($request);
+            $data = $client->execute($request);
         } catch (\Exception $e) {
-            throw new PaymentException($e->getMessage());
+            $data = $this->_getErrorResponse($e, $transaction);
         }
 
-        return $this->getResponseModel($apiResponse);
+        return $this->getResponseModel($data);
     }
 
     /**
@@ -468,17 +468,7 @@ class Gateway extends BaseGateway
         try {
             $data = $client->execute($request);
         } catch (HttpException|IOException $e) {
-            $message = $e->getMessage();
-            $message = Json::isJsonObject($message) ? Json::decode($message) : $message;
-
-            $data = (object)[
-                'statusCode' => $e instanceof HttpException ? $e->statusCode : 400,
-                'result' => (object)[
-                    'id' => $transaction->reference,
-                    'message' => is_array($message) && isset($message['message']) ? $message['message'] : $message,
-                    'status' => CheckoutResponse::STATUS_ERROR,
-                ],
-            ];
+            $data = $this->_getErrorResponse($e, $transaction);
         }
 
         return $this->getResponseModel($data);
@@ -1021,5 +1011,26 @@ class Gateway extends BaseGateway
         }
 
         return implode('&', $params);
+    }
+
+    /**
+     * @param \Exception $e
+     * @param Transaction $transaction
+     * @return HttpResponse
+     */
+    private function _getErrorResponse(\Exception $e, Transaction $transaction): HttpResponse
+    {
+        $message = $e->getMessage();
+        $message = Json::isJsonObject($message) ? Json::decode($message) : $message;
+
+        return new HttpResponse(
+            $e instanceof HttpException ? $e->statusCode : 400,
+            (object)[
+                'id' => $transaction->reference,
+                'message' => is_array($message) && isset($message['message']) ? $message['message'] : $message,
+                'status' => CheckoutResponse::STATUS_ERROR,
+            ],
+            [],
+        );
     }
 }
