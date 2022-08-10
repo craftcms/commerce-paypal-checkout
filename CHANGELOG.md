@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## 2.1.0.2 - 2022-08-10
+
+### Fixed
+- Fixed an error that could occur when attempting to refund an order.
+
 ## 2.1.0.1 - 2022-07-21
 
 ### Fixed
@@ -22,7 +27,7 @@
 ## 1.3.2.1 - 2022-02-24
 
 ### Fixed
-- Fixed an error that could occur when trying to refund an order. ([#49](https://github.com/craftcms/commerce-paypal-checkout/issues/49))
+- Fixed an error that could occur when attempting to refund an order. ([#49](https://github.com/craftcms/commerce-paypal-checkout/issues/49))
 
 ## 1.3.2 - 2022-02-24
 
