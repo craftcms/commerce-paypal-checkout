@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 2.1.0.2 - 2022-08-10
 
 ### Fixed
 - Fixed an error that could occur when attempting to refund an order.
