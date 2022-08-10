@@ -124,7 +124,7 @@ class RefundResponse implements RequestResponseInterface
      */
     public function getMessage(): string
     {
-        if (!isset($this->data, $this->data->result) || !$this->data) {
+        if (!isset($this->data) || !$this->data || !isset($this->data->result)) {
             return '';
         }
 
