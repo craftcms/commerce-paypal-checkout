@@ -600,7 +600,7 @@ class Gateway extends BaseGateway
 
         try {
             $apiResponse = $client->execute($request);
-            return $this->getRefundResponseModel($apiResponse);
+            return $this->getResponseModel($apiResponse);
         } catch (HttpException|IOException $e) {
             return $this->getRefundResponseModel(new HttpResponse(0, Json::decodeIfJson($e->getMessage()), []));
         }
