@@ -40,10 +40,8 @@ class PayPalAuthorizationInjector implements Injector
 
     public function inject($httpRequest): void
     {
-        if (!$this->hasAuthHeader($httpRequest) && !$this->isAuthRequest($httpRequest))
-        {
-            if (is_null($this->accessToken) || $this->accessToken->isExpired())
-            {
+        if (!$this->hasAuthHeader($httpRequest) && !$this->isAuthRequest($httpRequest)) {
+            if (is_null($this->accessToken) || $this->accessToken->isExpired()) {
                 $this->accessToken = $this->getAccessToken();
             }
             $httpRequest->headers['Authorization'] = 'Bearer ' . $this->accessToken->token;
@@ -84,7 +82,7 @@ class PayPalAuthorizationInjector implements Injector
     }
 
     /**
-     * @param $request
+     * @param HttpRequest $request
      * @return bool
      */
     private function isAuthRequest($request): bool
