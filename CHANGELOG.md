@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 1.3.3 - 2022-08-24
 
 ### Added
 - Added `craft\commerce\paypalcheckout\injectors\PayPalAuthorizationInjector`.
