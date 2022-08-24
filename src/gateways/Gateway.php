@@ -19,6 +19,7 @@ use craft\commerce\models\payments\BasePaymentForm;
 use craft\commerce\models\payments\OffsitePaymentForm;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\models\Transaction;
+use craft\commerce\paypalcheckout\injectors\PayPalAuthorizationInjector;
 use craft\commerce\paypalcheckout\PayPalCheckoutBundle;
 use craft\commerce\paypalcheckout\responses\CheckoutResponse;
 use craft\commerce\paypalcheckout\responses\RefundResponse;
@@ -29,6 +30,7 @@ use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Response as WebResponse;
 use craft\web\View;
+use PayPalCheckoutSdk\Core\AuthorizationInjector;
 use PayPalCheckoutSdk\Core\PayPalHttpClient;
 use PayPalCheckoutSdk\Core\ProductionEnvironment;
 use PayPalCheckoutSdk\Core\SandboxEnvironment;
@@ -492,7 +494,18 @@ class Gateway extends BaseGateway
             $environment = new SandboxEnvironment($this->getClientId(), $this->getSecret());
         }
 
-        return new PayPalHttpClient($environment);
+        $httpClient = new PayPalHttpClient($environment);
+
+        foreach ($httpClient->injectors as &$injector) {
+            if (!$injector instanceof AuthorizationInjector) {
+                continue;
+            }
+
+            // Replace the core authorization injector
+            $injector = new PayPalAuthorizationInjector($httpClient, $environment);
+        }
+
+        return $httpClient;
     }
 
     /**

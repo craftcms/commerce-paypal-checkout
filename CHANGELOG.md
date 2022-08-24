@@ -1,5 +1,13 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Added
+- Added `craft\commerce\paypalcheckout\injectors\PayPalAuthorizationInjector`.
+
+### Fixed
+- Fixed a bug where the PayPal API access token wasn’t being cached. ([#64](https://github.com/craftcms/commerce-paypal-checkout/issues/64))
+
 ## 1.3.2.1 - 2022-02-24
 
 ### Fixed
