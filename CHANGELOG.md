@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 2.1.1 - 2022-08-24
 
 ### Fixed
 - Fixed a bug where the PayPal API access token wasn’t being cached. ([#64](https://github.com/craftcms/commerce-paypal-checkout/issues/64))
