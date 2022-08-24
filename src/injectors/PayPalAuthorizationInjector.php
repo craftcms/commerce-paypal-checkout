@@ -17,6 +17,7 @@ use PayPalHttp\HttpException;
 use PayPalHttp\HttpRequest;
 use PayPalHttp\Injector;
 use PayPalHttp\IOException;
+use stdClass;
 
 /**
  * AuthorizationInjector class override
@@ -64,6 +65,7 @@ class PayPalAuthorizationInjector implements Injector
         $accessToken = Craft::$app->getCache()->get($this->getCacheKey());
         if (!$accessToken) {
             $accessTokenResponse = $this->client->execute(new AccessTokenRequest($this->environment, $this->refreshToken));
+            /** @var stdClass $accessTokenResult */
             $accessTokenResult = $accessTokenResponse->result;
 
             $accessToken = new AccessToken($accessTokenResult->access_token, $accessTokenResult->token_type, $accessTokenResult->expires_in);
