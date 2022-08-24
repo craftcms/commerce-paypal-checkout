@@ -26,10 +26,10 @@ use PayPalHttp\IOException;
  */
 class PayPalAuthorizationInjector implements Injector
 {
-    public $client;
-    public $environment;
-    public $refreshToken = null;
-    public $accessToken = null;
+    public HttpClient $client;
+    public PayPalEnvironment $environment;
+    public ?string $refreshToken = null;
+    public ?AccessToken $accessToken = null;
 
     public function __construct(HttpClient $client, PayPalEnvironment $environment, $refreshToken = null)
     {
@@ -38,6 +38,10 @@ class PayPalAuthorizationInjector implements Injector
         $this->refreshToken = $refreshToken;
     }
 
+    /**
+     * @throws HttpException
+     * @throws IOException
+     */
     public function inject($httpRequest): void
     {
         if (!$this->hasAuthHeader($httpRequest) && !$this->isAuthRequest($httpRequest)) {
@@ -76,7 +80,7 @@ class PayPalAuthorizationInjector implements Injector
     {
         return [
             'PayPalAuth',
-            get_class($this->environment),
+            $this->environment::class,
             $this->environment->authorizationString(),
         ];
     }
@@ -85,7 +89,7 @@ class PayPalAuthorizationInjector implements Injector
      * @param HttpRequest $request
      * @return bool
      */
-    private function isAuthRequest($request): bool
+    private function isAuthRequest(HttpRequest $request): bool
     {
         return $request instanceof AccessTokenRequest || $request instanceof RefreshTokenRequest;
     }
