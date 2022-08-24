@@ -45,6 +45,9 @@
     "allow-plugins": {
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true
+    },
+    "platform": {
+      "php": "7.2.5"
     }
   },
   "require-dev": {
