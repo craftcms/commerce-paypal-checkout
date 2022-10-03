@@ -95,3 +95,17 @@ For example, to disable PayPal credit funding you could output the payment form 
   ...
 }) }}
 ```
+
+### Use custom payment urls
+
+If custom payment urls are needed, they can be provided by using `prepareUrl` and `completeUrl`. One common use-case for that, is setting the used site.
+
+```cart
+{% namespace cart.gateway.handle|commercePaymentFormNamespace %}
+  {{ cart.gateway.getPaymentFormHtml({
+    currency: cart.paymentCurrency,
+    prepareUrl: actionUrl('commerce/payments/pay', {'siteToken': currentSite.id|hash }),
+    completeUrl: actionUrl('commerce/payments/complete-payment', {'siteToken': currentSite.id|hash }),
+  })|raw }}
+{% endnamespace %}
+```

@@ -1,5 +1,5 @@
 <div class="paypal-rest-form" data-env="{{ gateway.testMode ? 'sandbox' : 'production' }}"
-     data-prepare="{{ actionUrl('commerce/payments/pay') }}"
-     data-complete="{{ actionUrl('commerce/payments/complete-payment') }}">
+     data-prepare="{{ prepareUrl ?? actionUrl('commerce/payments/pay') }}"
+     data-complete="{{ completeUrl ?? actionUrl('commerce/payments/complete-payment') }}">
   <div id="paypal-button-container"></div>
 </div>
