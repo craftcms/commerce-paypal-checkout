@@ -13,25 +13,29 @@ function initPaypalCheckout() {
     var $form = findClosestParent($wrapper, function(element) {
       return element.tagName === 'FORM';
     });
-    var paymentUrl = $wrapper.dataset.prepare;
     var completeUrl = $wrapper.dataset.complete;
     var transactionHash;
     var errorShown = false;
+    let responseError = false;
 
     paypal_checkout_sdk.Buttons({
       createOrder: function(data, actions) {
         var form = new FormData($form);
 
-        return fetch(paymentUrl, {
+        return fetch(window.location.href, {
           method: 'post',
           body: form,
           headers: {
             'Accept': 'application/json'
           }
         }).then(function(res) {
+          if (res.status != 200) {
+            responseError = true;
+          }
+
           return res.json();
         }).then(function(data) {
-          if (data.error) {
+          if (responseError) {
             var errorMessage = '';
 
             try {
@@ -42,11 +46,12 @@ function initPaypalCheckout() {
               }
             } catch (e) {
               // Handle Commerce errors
-              errorMessage = data.error;
+              errorMessage = data.message;
             }
 
             throw Error(errorMessage);
           }
+
           transactionHash = data.transactionHash;
           return data.transactionId; // Use the same key name for order ID on the client and server
         }).catch(function(error) {
