@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Fixed
+- Fixed an error that occurred when making a partial refund. ([#65](https://github.com/craftcms/commerce-paypal-checkout/issues/65))
+
 ## 1.3.3 - 2022-08-24
 
 ### Added
