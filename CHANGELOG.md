@@ -34,6 +34,11 @@
 - Added Craft CMS 4 and Craft Commerce 4 compatibility.
 - All gateway settings now support environment variables.
 
+## 1.3.4 - 2022-11-08
+
+### Fixed
+- Fixed an error that occurred when making a partial refund. ([#65](https://github.com/craftcms/commerce-paypal-checkout/issues/65))
+
 ## 1.3.3 - 2022-08-24
 
 ### Added
