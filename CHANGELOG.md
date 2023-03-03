@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 2.1.2 - 2023-03-03
 
 ### Added
 - Added the ability to set `enable-funding` PayPal SDK query parameters. ([#73](https://github.com/craftcms/commerce-paypal-checkout/issues/73))
