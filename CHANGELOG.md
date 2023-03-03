@@ -3,7 +3,7 @@
 ## Unreleased
 
 ### Added
-- Added the ability to set `enable-funding` PayPal SDK query parameters. ([#31](https://github.com/craftcms/commerce-paypal/issues/31))
+- Added the ability to set `enable-funding` PayPal SDK query parameters. ([#73](https://github.com/craftcms/commerce-paypal-checkout/issues/73))
 
 ### Fixed
 - Fixed a bug where payments weren’t being processed in the correct site on multi-site projects. ([#67](https://github.com/craftcms/commerce-paypal-checkout/issues/67))
