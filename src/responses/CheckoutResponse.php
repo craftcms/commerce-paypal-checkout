@@ -139,6 +139,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getRedirectUrl(): string
     {
+        /** @phpstan-ignore-next-line */
         if (!is_object($this->data->result) || (is_object($this->data->result) && !isset($this->data->result->id))) {
             return '';
         }
@@ -153,6 +154,7 @@ class CheckoutResponse implements RequestResponseInterface
      */
     public function getTransactionReference(): string
     {
+        /** @phpstan-ignore-next-line */
         if (!is_object($this->data->result) || (is_object($this->data->result) && !isset($this->data->result->id))) {
             return '';
         }
