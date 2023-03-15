@@ -732,7 +732,7 @@ class Gateway extends BaseGateway
     }
 
     /**
-     * @return true
+     * @return bool
      */
     public function showPaymentFormSubmitButton(): bool
     {
