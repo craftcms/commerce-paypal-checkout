@@ -732,6 +732,14 @@ class Gateway extends BaseGateway
     }
 
     /**
+     * @return true
+     */
+    public function showPaymentFormSubmitButton(): bool
+    {
+        return false;
+    }
+
+    /**
      * @param Transaction $transaction
      * @return array
      * @throws Exception

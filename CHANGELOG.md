@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::showPaymentFormSubmitButton()`.
+
 ## 2.1.2 - 2023-03-03
 
 ### Added
