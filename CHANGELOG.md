@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## 3.0.0 - Unreleased
+
+- Added Craft CMS 5 and Craft Commerce 5 compatibility.
+
 ## Unreleased
 
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::showPaymentFormSubmitButton()`.
