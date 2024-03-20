@@ -4,8 +4,8 @@ about: Create a report to help us improve
 title: ''
 labels:
   - bug
+  - Craft Commerce # Linear
   - Craft Commerce → PayPal Checkout # Linear
-  - Bug # Linear
 
 assignees: ''
 
