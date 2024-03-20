@@ -868,7 +868,7 @@ class Gateway extends BaseGateway
                 'sku' => StringHelper::truncate($lineItem->getSku(), 127, ''),
                 'unit_amount' => [
                     'currency_code' => $order->paymentCurrency,
-                    'value' => (string)Currency::round($lineItem->onSale ? $lineItem->salePrice : $lineItem->price),
+                    'value' => (string)Currency::round($lineItem->getOnPromotion() ? $lineItem->salePrice : $lineItem->price),
                 ], // required
                 'quantity' => $lineItem->qty, // required
             ];
