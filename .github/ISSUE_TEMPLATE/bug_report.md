@@ -2,7 +2,11 @@
 name: Bug Report
 about: Create a report to help us improve
 title: ''
-labels: New
+labels:
+  - bug
+  - Craft Commerce # Linear
+  - Craft Commerce → PayPal Checkout # Linear
+
 assignees: ''
 
 ---
