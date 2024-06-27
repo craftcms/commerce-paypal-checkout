@@ -2,7 +2,11 @@
 
 ## Unreleased
 
+### Added
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::showPaymentFormSubmitButton()`.
+
+### Fixed
+- Fixed a 3rd party javascript vulnerability.
 
 ## 2.1.2 - 2023-03-03
 
