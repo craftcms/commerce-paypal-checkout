@@ -1,5 +1,10 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+### Fixed
+- Fixed a 3rd party javascript vulnerability.
+
 ## 1.3.4 - 2022-11-08
 
 ### Fixed
