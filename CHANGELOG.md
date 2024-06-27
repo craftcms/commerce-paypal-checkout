@@ -3,7 +3,7 @@
 ## 1.3.5 - 2023-06-27 [CRITICAL]
 
 ### Fixed
-- Fixed a 3rd party javascript vulnerability.
+- Fixed a supply chain security vulnerability.
 
 ## 1.3.4 - 2022-11-08
 
