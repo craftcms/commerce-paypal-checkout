@@ -3,7 +3,7 @@
 ## 3.0.1 - 2023-06-27 [CRITICAL]
 
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::showPaymentFormSubmitButton()`.
-- Fixed a 3rd party javascript vulnerability.
+- Fixed a supply chain security vulnerability.
 
 ## 3.0.0 - 2024-03-20
 
