@@ -352,7 +352,7 @@ class Gateway extends BaseGateway
         $view->registerJsFile(self::SDK_URL . '?' . $this->_sdkQueryParameters($params), ['data-namespace' => 'paypal_checkout_sdk']);
 
         // IE polyfill
-        $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
+        $view->registerJsFile('https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=fetch%2CPromise%2CPromise.prototype.finally');
         $view->registerAssetBundle(PayPalCheckoutBundle::class);
 
         $html = Craft::$app->getView()->renderTemplate('commerce-paypal-checkout/paymentForm', $params);
