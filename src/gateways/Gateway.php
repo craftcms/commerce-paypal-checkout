@@ -18,6 +18,7 @@ use craft\commerce\models\payments\BasePaymentForm;
 use craft\commerce\models\payments\OffsitePaymentForm;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\models\Transaction;
+use craft\commerce\paypalcheckout\events\BuildGatewayRequestEvent;
 use craft\commerce\paypalcheckout\injectors\PayPalAuthorizationInjector;
 use craft\commerce\paypalcheckout\PayPalCheckoutBundle;
 use craft\commerce\paypalcheckout\responses\CheckoutResponse;
@@ -77,6 +78,31 @@ class Gateway extends BaseGateway
      * @since 1.1.0
      */
     public const SDK_URL = 'https://www.paypal.com/sdk/js';
+
+    /**
+     * @event BuildGatewayRequestEvent The event that is triggered when a gateway request is being built.
+     *
+     * Plugins get a chance to provide additional data to any request that is made to PayPal in the context of paying for an order.
+     *
+     * There are some restrictions:
+     *     Changes to the `Transaction` model available as the `transaction` property will be ignored;
+     *     Changes to amounts sent to paypal that cause the payment to be less that the transaction amount will not complete the order and cause unforeseen problems.
+     *
+     * ```php
+     * use craft\commerce\models\Transaction;
+     * use craft\commerce\paypalcheckout\events\BuildGatewayRequestEvent;
+     * use craft\commerce\paypalcheckout\base\Gateway as PaypalGateway;
+     * use yii\base\Event;
+     *
+     * Event::on(PaypalGateway::class, PaypalGateway::EVENT_BUILD_GATEWAY_REQUEST, function(BuildGatewayRequestEvent $e) {
+     *     if ($e->transaction->type === 'purchase') {
+     *         $e->request['someKey'] = 'some value';
+     *     }
+     * });
+     * ```
+     *
+     */
+    public const EVENT_BUILD_GATEWAY_REQUEST = 'buildGatewayRequest';
 
     /**
      * @var string|null PayPal account client ID.
@@ -597,6 +623,16 @@ class Gateway extends BaseGateway
             ],
         ];
 
+        $event = new BuildGatewayRequestEvent([
+            'type' => 'refund',
+            'transaction' => $transaction,
+            'request' => $body,
+        ]);
+
+        if ($this->hasEventHandlers(self::EVENT_BUILD_GATEWAY_REQUEST)) {
+            $this->trigger(self::EVENT_BUILD_GATEWAY_REQUEST, $event);
+        }
+
         // Get the data from different locations based on which type of transaction
         // the parent was
         $response = json_decode($parentTransaction->response, true);
@@ -607,7 +643,7 @@ class Gateway extends BaseGateway
         }
 
         $request = new CapturesRefundRequest($captureId);
-        $request->body = $body;
+        $request->body = $event->request;
         $request->prefer('return=representation');
         $client = $this->createClient();
 
@@ -768,7 +804,17 @@ class Gateway extends BaseGateway
             'cancel_url' => UrlHelper::siteUrl($order->cancelUrl),
         ];
 
-        return $requestData;
+        $event = new BuildGatewayRequestEvent([
+            'type' => 'purchase',
+            'transaction' => $transaction,
+            'request' => $requestData,
+        ]);
+
+        if ($this->hasEventHandlers(self::EVENT_BUILD_GATEWAY_REQUEST)) {
+            $this->trigger(self::EVENT_BUILD_GATEWAY_REQUEST, $event);
+        }
+
+        return $event->request;
     }
 
     /**
@@ -782,8 +828,7 @@ class Gateway extends BaseGateway
      */
     private function _buildPurchaseUnits(Order $order, Transaction $transaction): array
     {
-        // TODO update to `getName()` method when updating the cms requirement.
-        $siteName = Craft::$app->getSites()->getCurrentSite()->name;
+        $siteName = Craft::$app->getSites()->getCurrentSite()->getName();
         $purchaseUnits = [
             'description' => StringHelper::truncate($siteName, 127, ''),
             'invoice_id' => StringHelper::truncate($order->number, 127, ''),
