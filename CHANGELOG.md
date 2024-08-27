@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- Added `craft\commerce\paypalcheckout\gateways\Gateway::EVENT_BUILD_GATEWAY_REQUEST`.
-- Added `craft\commerce\paypalcheckout\events\BuildGatewayRequestEvent`.
+- Added `craft\commerce\paypalcheckout\gateways\Gateway::EVENT_BUILD_GATEWAY_REQUEST`. ([#89](https://github.com/craftcms/commerce-paypal-checkout/issues/89))
+- Added `craft\commerce\paypalcheckout\events\BuildGatewayRequestEvent`. ([#89](https://github.com/craftcms/commerce-paypal-checkout/issues/89))
 
 ## 3.0.1 - 2023-06-27 [CRITICAL]
 
