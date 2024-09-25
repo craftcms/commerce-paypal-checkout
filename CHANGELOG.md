@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+- Fixed a bug where refunds could be incorrectly marked as failed. ([#82](https://github.com/craftcms/commerce-paypal-checkout/issues/82))
+
 ## 2.1.3 - 2023-06-27 [CRITICAL]
 
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::showPaymentFormSubmitButton()`.
