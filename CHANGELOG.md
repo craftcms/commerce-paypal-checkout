@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 3.0.2 - 2023-02-03
 
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::EVENT_BUILD_GATEWAY_REQUEST`. ([#89](https://github.com/craftcms/commerce-paypal-checkout/issues/89))
 - Added `craft\commerce\paypalcheckout\events\BuildGatewayRequestEvent`. ([#89](https://github.com/craftcms/commerce-paypal-checkout/issues/89))
