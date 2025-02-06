@@ -44,7 +44,7 @@ class RefundResponse implements RequestResponseInterface
      */
     public function isProcessing(): bool
     {
-        return false;
+        return $this->data && isset($this->data->result->status) && $this->data->result->status == 'PENDING';
     }
 
     /**
@@ -130,6 +130,10 @@ class RefundResponse implements RequestResponseInterface
 
         if (is_array($this->data->result) && isset($this->data->result['message'])) {
             return $this->data->result['message'];
+        }
+
+        if (is_array($this->data->result) && isset($this->data->result['status_details']['reason'])) {
+            return $this->data->result['status_details']['reason'];
         }
 
         if (isset($this->data->result->message)) {

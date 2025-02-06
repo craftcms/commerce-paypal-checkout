@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+- Fixed a bug where refunds could be incorrectly marked as failed. ([#82](https://github.com/craftcms/commerce-paypal-checkout/issues/82))
+
 ## 3.0.2 - 2023-02-03
 
 - Added `craft\commerce\paypalcheckout\gateways\Gateway::EVENT_BUILD_GATEWAY_REQUEST`. ([#89](https://github.com/craftcms/commerce-paypal-checkout/issues/89))
