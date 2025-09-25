@@ -56,9 +56,11 @@ class CheckoutResponse implements RequestResponseInterface
         $this->status = self::STATUS_REDIRECT;
 
         if ($this->data && ($this->data->result && is_object($this->data->result)) && (isset($this->data->result->status) && $this->data->result->status == 'COMPLETED')) {
+            
             $this->status = self::STATUS_SUCCESSFUL;
 
             if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units->payments)) {
+                
                 $captureStatus = null;
                 $authorizeStatus = null;
 
@@ -73,6 +75,11 @@ class CheckoutResponse implements RequestResponseInterface
                 if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
                     $this->status = self::STATUS_PROCESSING;
                 }
+
+                if ($captureStatus == 'DECLINED' || $authorizeStatus == 'DECLINED') {
+                    $this->status = self::STATUS_ERROR;
+                }
+                
             }
         } elseif ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
             $this->status = self::STATUS_ERROR;
