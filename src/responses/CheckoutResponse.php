@@ -59,28 +59,29 @@ class CheckoutResponse implements RequestResponseInterface
             
             $this->status = self::STATUS_SUCCESSFUL;
 
-            if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units->payments)) {
+            if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units[0]->payments)) {
                 
                 $captureStatus = null;
                 $authorizeStatus = null;
 
-                if (!empty($this->data->result->purchase_units->payments->captures)) {
-                    $captureStatus = $this->data->result->purchase_units->payments->captures[0]->status;
+                if (!empty($this->data->result->purchase_units[0]->payments->captures)) {
+                    $captureStatus = $this->data->result->purchase_units[0]->payments->captures[0]->status;
                 }
 
-                if (!empty($this->data->result->purchase_units->payments->authorizations)) {
-                    $authorizeStatus = $this->data->result->purchase_units->payments->authorizations[0]->status;
+                if (!empty($this->data->result->purchase_units[0]->payments->authorizations)) {
+                    $authorizeStatus = $this->data->result->purchase_units[0]->payments->authorizations[0]->status;
                 }
 
                 if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
                     $this->status = self::STATUS_PROCESSING;
                 }
 
-                if ($captureStatus == 'DECLINED' || $authorizeStatus == 'DECLINED') {
+                if ($captureStatus == 'DECLINED' || $authorizeStatus == 'DECLINED' || $captureStatus == 'FAILED' || $authorizeStatus == 'FAILED') {
                     $this->status = self::STATUS_ERROR;
                 }
                 
             }
+
         } elseif ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {
             $this->status = self::STATUS_ERROR;
         }
