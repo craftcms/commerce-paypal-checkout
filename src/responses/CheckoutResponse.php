@@ -58,20 +58,30 @@ class CheckoutResponse implements RequestResponseInterface
         if ($this->data && ($this->data->result && is_object($this->data->result)) && (isset($this->data->result->status) && $this->data->result->status == 'COMPLETED')) {
             $this->status = self::STATUS_SUCCESSFUL;
 
-            if (isset($this->data->result->purchase_units) && isset($this->data->result->purchase_units->payments)) {
-                $captureStatus = null;
-                $authorizeStatus = null;
+            if (isset($this->data->result->purchase_units)) {
+                // For backwards compatibility, we need to check if the purchase_units is an array or an object
+                // As at some point PayPal changed the structure of the response
+                $purchaseUnits = is_array($this->data->result->purchase_units) ? $this->data->result->purchase_units[0] : $this->data->result->purchase_units;
 
-                if (!empty($this->data->result->purchase_units->payments->captures)) {
-                    $captureStatus = $this->data->result->purchase_units->payments->captures[0]->status;
-                }
+                if (isset($purchaseUnits->payments)) {
+                    $captureStatus = null;
+                    $authorizeStatus = null;
 
-                if (!empty($this->data->result->purchase_units->payments->authorizations)) {
-                    $authorizeStatus = $this->data->result->purchase_units->payments->authorizations[0]->status;
-                }
+                    if (!empty($purchaseUnits->payments->captures)) {
+                        $captureStatus = $purchaseUnits->payments->captures[0]->status;
+                    }
 
-                if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
-                    $this->status = self::STATUS_PROCESSING;
+                    if (!empty($purchaseUnits->payments->authorizations)) {
+                        $authorizeStatus = $purchaseUnits->payments->authorizations[0]->status;
+                    }
+
+                    if ($captureStatus == 'PENDING' || $authorizeStatus == 'PENDING') {
+                        $this->status = self::STATUS_PROCESSING;
+                    }
+
+                    if ($captureStatus == 'DECLINED' || $authorizeStatus == 'DECLINED' || $captureStatus == 'FAILED' || $authorizeStatus == 'FAILED') {
+                        $this->status = self::STATUS_ERROR;
+                    }
                 }
             }
         } elseif ($this->data && isset($this->data->result->status) && $this->data->result->status == self::STATUS_ERROR) {

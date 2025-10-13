@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+- Fixed a bug where declined payments weren’t being marked as failed. ([#94](https://github.com/craftcms/commerce-paypal-checkout/pull/94))
+
 ## 3.0.3 - 2025-02-06
 
 - Fixed a bug where refunds could be incorrectly marked as failed. ([#82](https://github.com/craftcms/commerce-paypal-checkout/issues/82))
