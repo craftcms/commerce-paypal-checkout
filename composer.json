@@ -37,7 +37,7 @@
   "extra": {
     "name": "PayPal Checkout for Craft Commerce",
     "handle": "commerce-paypal-checkout",
-    "documentationUrl": "https://github.com/craftcms/commerce-paypal-checkout/blob/master/README.md"
+    "documentationUrl": "https://github.com/craftcms/commerce-paypal-checkout/blob/2.x/README.md"
   },
   "prefer-stable": true,
   "minimum-stability": "dev",
