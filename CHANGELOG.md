@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+- Fixed a PHP error that occurred when parsing environment variables for boolean gateway settings.
+
 ## 3.0.4 - 2025-10-14
 
 - Fixed a bug where declined payments weren’t being marked as failed. ([#94](https://github.com/craftcms/commerce-paypal-checkout/pull/94))

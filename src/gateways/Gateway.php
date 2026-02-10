@@ -274,7 +274,7 @@ class Gateway extends BaseGateway
      */
     public function getTestMode(bool $parse = true): bool|string
     {
-        return $parse ? App::parseBooleanEnv($this->_testMode) : $this->_testMode;
+        return $parse ? (App::parseBooleanEnv($this->_testMode) ?? false) : $this->_testMode;
     }
 
     /**
@@ -297,7 +297,7 @@ class Gateway extends BaseGateway
      */
     public function getSendCartInfo(bool $parse = true): bool|string
     {
-        return $parse ? App::parseBooleanEnv($this->_sendCartInfo) : $this->_sendCartInfo;
+        return $parse ? (App::parseBooleanEnv($this->_sendCartInfo) ?? false) : $this->_sendCartInfo;
     }
 
     /**
@@ -320,7 +320,7 @@ class Gateway extends BaseGateway
      */
     public function getSendShippingInfo(bool $parse = true): bool|string
     {
-        return $parse ? App::parseBooleanEnv($this->_sendShippingInfo) : $this->_sendShippingInfo;
+        return $parse ? (App::parseBooleanEnv($this->_sendShippingInfo) ?? true) : $this->_sendShippingInfo;
     }
 
     /**
