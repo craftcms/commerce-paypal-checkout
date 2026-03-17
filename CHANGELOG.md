@@ -1,6 +1,6 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
-## Unreleased
+## 3.1.0 - 2026-03-17
 
 - It is now possible to provide the `components` parameter for the PayPal JS SDK. ([#95](https://github.com/craftcms/commerce-paypal-checkout/issues/95))
 - Fixed a PHP error that occurred when parsing environment variables for boolean gateway settings.
