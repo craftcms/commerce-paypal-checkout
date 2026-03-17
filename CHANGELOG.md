@@ -3,6 +3,7 @@
 ## Unreleased
 
 - It is now possible to provide the `components` parameter for the PayPal JS SDK. ([#95](https://github.com/craftcms/commerce-paypal-checkout/issues/95))
+- Fixed a PHP error that occurred when parsing environment variables for boolean gateway settings.
 
 ## 3.0.4 - 2025-10-14
 
