@@ -1,5 +1,9 @@
 # Release Notes for PayPal Checkout for Craft Commerce
 
+## Unreleased
+
+- It is now possible to provide the `components` parameter for the PayPal JS SDK. ([#95](https://github.com/craftcms/commerce-paypal-checkout/issues/95))
+
 ## 3.0.4 - 2025-10-14
 
 - Fixed a bug where declined payments weren’t being marked as failed. ([#94](https://github.com/craftcms/commerce-paypal-checkout/pull/94))

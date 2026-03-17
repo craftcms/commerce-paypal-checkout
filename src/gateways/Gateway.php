@@ -1060,6 +1060,7 @@ class Gateway extends BaseGateway
             'disable-funding',
             'enable-funding',
             'locale',
+            'components',
         ];
         $intent = strtolower(self::PAYMENT_TYPES[$this->paymentType]);
         $params = [
