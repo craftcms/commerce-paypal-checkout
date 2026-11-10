@@ -1,11 +1,13 @@
-<p align="center"><img src="./src/icon.svg" width="100" height="100" alt="PayPal Checkout for Craft Commerce icon"></p>
+<p align="center"><img src="./resources/icon.svg" width="100" height="100" alt="PayPal Checkout for Craft Commerce icon"></p>
 <h1 align="center">PayPal Checkout for Craft Commerce</h1>
 
 This plugin provides a [PayPal Checkout](https://www.paypal.com/uk/webapps/mpp/checkout) gateway integration for [Craft Commerce](https://craftcms.com/commerce).
 
 ## Requirements
 
-This plugin requires Craft 5.0 and Craft Commerce 5.0 or later.
+PayPal Checkout 4.x requires Craft CMS 6.0, Craft Commerce 6.0 and PHP 8.5 or later.
+
+PayPal Checkout 3.x supports Craft 5 and Craft Commerce 5. If you’re upgrading from 3.x, see [UPGRADE.md](UPGRADE.md).
 
 ## Installation
 
@@ -27,7 +29,7 @@ cd /path/to/my-project.test
 composer require craftcms/commerce-paypal-checkout
 
 # tell Craft to install the plugin
-php craft plugin/install commerce-paypal-checkout
+php artisan craft:plugin:install commerce-paypal-checkout
 ```
 
 ## Setup
@@ -59,6 +61,9 @@ Use the **Live** and **Sandbox** toggle at the top of **My Apps & Credentials** 
 To add the PayPal Checkout gateway, go to **Commerce** → **Settings** → **Gateways**, create a new gateway, and set the gateway type to “PayPal Checkout”.
 
 In the gateway settings, enter the **client ID** and **secret** for your REST app in their respective fields.
+
+> [!NOTE]
+> All gateway settings can be set to environment variables. See [Environmental Configuration](https://craftcms.com/docs/6.x/configure.html#control-panel-settings) in the Craft docs to learn more.
 
 ### Cart Info / Cost Breakdown
 
@@ -98,3 +103,20 @@ For example, to disable PayPal credit funding you could output the payment form 
   ...
 }) }}
 ```
+
+### Customizing PayPal requests
+
+To change the request sent to PayPal when an order is created or a payment is refunded, listen for the `GatewayRequestBuilding` event and modify its `request` array. Its `type` is `purchase` for the [Create order](https://developer.paypal.com/docs/api/orders/v2/#orders_create) request and `refund` for the [Refund captured payment](https://developer.paypal.com/docs/api/payments/v2/#captures_refund) request.
+
+```php
+use CraftCms\CommercePayPalCheckout\Events\GatewayRequestBuilding;
+use Illuminate\Support\Facades\Event;
+
+Event::listen(function(GatewayRequestBuilding $event): void {
+    if ($event->type === 'purchase') {
+        $event->request['purchase_units'][0]['description'] = 'My store';
+    }
+});
+```
+
+Changes to the transaction are ignored, and changing amounts so the payment is less than the transaction amount won’t complete the order.

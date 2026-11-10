@@ -39,18 +39,18 @@ function initPaypalCheckout() {
             })
             .then(function (data) {
               if (responseError) {
-                var errorMessage = '';
+                // Commerce errors are plain messages
+                var errorMessage = data.message;
 
                 try {
-                  // Handle PayPal errors
-                  var error = JSON.parse(data.error);
+                  // PayPal errors are the JSON body PayPal returned
+                  var error = JSON.parse(data.error || data.message);
                   if (error.details && error.details.length) {
                     errorMessage = error.details[0].description;
+                  } else if (error.message) {
+                    errorMessage = error.message;
                   }
-                } catch (e) {
-                  // Handle Commerce errors
-                  errorMessage = data.message;
-                }
+                } catch (e) {}
 
                 throw Error(errorMessage);
               }

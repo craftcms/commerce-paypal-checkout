@@ -1,13 +1,12 @@
 {
   "name": "craftcms/commerce-paypal-checkout",
-  "description": "PayPal Checkout integration for Craft Commerce 5.0+",
+  "description": "PayPal Checkout integration for Craft Commerce 6.0+",
   "type": "craft-plugin",
   "keywords": [
     "paypal",
     "checkout",
     "commerce",
-    "craftcms",
-    "yii2"
+    "craftcms"
   ],
   "license": "MIT",
   "authors": [
@@ -20,43 +19,53 @@
     "email": "support@craftcms.com",
     "issues": "https://github.com/craftcms/commerce-paypal-checkout/issues?state=open",
     "source": "https://github.com/craftcms/commerce-paypal-checkout",
-    "docs": "https://github.com/craftcms/commerce-paypal-checkout/blob/3.x/README.md",
-    "rss": "https://github.com/craftcms/commerce-paypal-checkout/commits/3.x.atom"
+    "docs": "https://github.com/craftcms/commerce-paypal-checkout/blob/4.x/README.md",
+    "rss": "https://github.com/craftcms/commerce-paypal-checkout/commits/4.x.atom"
   },
   "require": {
-    "php": "^8.2",
-    "craftcms/cms": "^5.0.0-beta.6",
-    "craftcms/commerce": "^5.0.0-beta.1",
-    "paypal/paypal-checkout-sdk": "^1.0"
+    "php": "^8.5",
+    "craftcms/commerce": "6.x-dev"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "larastan/larastan": "^3.4",
+    "orchestra/testbench": "^11.0",
+    "pestphp/pest": "^4.0",
+    "pestphp/pest-plugin-laravel": "^4.0"
   },
   "autoload": {
     "psr-4": {
-      "craft\\commerce\\paypalcheckout\\": "src/"
+      "CraftCms\\CommercePayPalCheckout\\": "src/",
+      "craft\\commerce\\paypalcheckout\\": "legacy/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "CraftCms\\CommercePayPalCheckout\\Tests\\": "tests/"
     }
   },
   "extra": {
     "name": "PayPal Checkout for Craft Commerce",
     "handle": "commerce-paypal-checkout",
-    "documentationUrl": "https://github.com/craftcms/commerce-paypal-checkout/blob/3.x/README.md"
+    "developer": "Pixel & Tonic",
+    "documentationUrl": "https://github.com/craftcms/commerce-paypal-checkout/blob/4.x/README.md",
+    "class": "CraftCms\\CommercePayPalCheckout\\Plugin"
   },
-  "prefer-stable": true,
   "minimum-stability": "dev",
-  "config": {
-    "allow-plugins": {
-      "yiisoft/yii2-composer": true,
-      "craftcms/plugin-installer": true
-    },
-    "platform": {
-      "php": "8.2"
-    }
-  },
-  "require-dev": {
-    "craftcms/phpstan": "dev-main",
-    "craftcms/ecs": "dev-main"
-  },
+  "prefer-stable": true,
   "scripts": {
-    "phpstan": "phpstan --memory-limit=1G",
     "check-cs": "ecs check --ansi",
-    "fix-cs": "ecs check --ansi --fix"
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G",
+    "test": "pest"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "craftcms/plugin-installer": true,
+      "pestphp/pest-plugin": true,
+      "php-http/discovery": true,
+      "yiisoft/yii2-composer": true
+    }
   }
 }
